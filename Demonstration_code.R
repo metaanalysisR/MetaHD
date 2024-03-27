@@ -1,14 +1,10 @@
-library(MetaHD)
-library(readxl)
 library(tidyr)
 library(Matrix)
 library(matrixcalc)
 library(corpcor)
+library(readxl)
 
 ### APPLICATION TO REAL DATA ###
-
-#Set working directory
-setwd("C:/Users/21460438/OneDrive - LA TROBE UNIVERSITY/Documents/PhD Work/Datasets")
 
 # Read the data
 GCLC_data <- read_excel("GC-LC_data.xlsx",sheet = "GC-LC_data")
