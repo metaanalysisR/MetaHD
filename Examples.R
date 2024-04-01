@@ -1,15 +1,11 @@
-library(readxl)
-library(tidyr)
-library(Matrix)
-library(matrixcalc)
-library(corpcor)
-
-source("C:\\Users\\21460438\\OneDrive - LA TROBE UNIVERSITY\\Documents\\MetaHD\\R\\MetaHD_code.R")
-
+## Necessary librarires
+#library(readxl)
+#library(tidyr)
+#library(Matrix)
+#library(matrixcalc)
+#library(corpcor)
+#################################################################################################################################
 ### APPLICATION TO REAL DATA ###
-
-#Set working directory
-setwd("C:/Users/21460438/OneDrive - LA TROBE UNIVERSITY/Documents/PhD Work/Datasets")
 
 # Read the data
 GCLC_data <- read_excel("GC-LC_data.xlsx",sheet = "GC-LC_data")
@@ -45,10 +41,11 @@ Slist <- Sk
 model <- MetaHD(Y, Slist)
 model$estimate
 
-
+#################################################################################################################################
 ### APPLICATION TO SIMULATED DATA ###
 
-## COMPLETE DATA ##
+## COMPLETE DATA EXAMPLE ##
+
 # Read the data
 Effects <- read_excel("simulated_data_1.xlsx", sheet = "effect_sizes")
 WSVar <- read_excel("simulated_data_1.xlsx", sheet = "within-study_variances")
@@ -81,6 +78,7 @@ model_1 <- MetaHD(Y,
 model_1$estimate # TRUE VALUES ARE: 5, 1, 3, 2, 4, 2, 1, 1, 5, 1, 1, 5, 5, 2, 3, 5, 4, 5, 1, 1, 2, 5, 1, 2, 1, 5, 4, 1, 4, 2
 
 ## IN THE PRESENCE OF MISSING VALUES ##
+
 # Read the data
 Effects <- read_excel("simulated_data_2.xlsx", sheet = "effect_sizes")
 WSVar <- read_excel("simulated_data_2.xlsx", sheet = "within-study_variances")
