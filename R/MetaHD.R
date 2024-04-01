@@ -1,9 +1,11 @@
-library(corpcor)
-library(Matrix)
-library(matrixcalc)
+## Necessary libraries
+# library(corpcor)
+# library(Matrix)
+# library(matrixcalc)
 
-MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),
-                   rigls.maxiter = 5,impute.na = FALSE,impute.var = 10^4){
+## 
+
+MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 5,impute.na = FALSE,impute.var = 10^4){
   y <- Y
   if (!is.matrix(y)){
     y <- as.matrix(y)
