@@ -1,0 +1,18 @@
+Package: MetaHD
+Type: Package
+Title: A Multivariate Meta-Analysis Model for Metabolomics Data
+Version: 0.1.0
+Author: 
+    person(given = "Jayamini",
+           family = "Liyanage",
+           role = c("aut", "cre"),
+           email = "j.liyanage@latrobe.edu.au")
+    person(given = "Alysha",
+           family = "De Livera",
+           role = c("aut", "cre"),
+           email = "a.delivera@latrobe.edu.au",
+           comment = c(ORCID = "0000-0003-4981-4155"))
+Description: The package performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
+License: 
+Encoding: UTF-8
+LazyData: true
