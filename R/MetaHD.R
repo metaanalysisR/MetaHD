@@ -21,21 +21,26 @@
   # I2.stat : I2 statistic
 
 MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 5,impute.na = FALSE,impute.var = 10^4){
+  # ENSURING Y IS A MATRIX
   y <- Y
   if (!is.matrix(y)){
     y <- as.matrix(y)
   }
+  # SET DIMENSIONS
   nay <- is.na(y)
   nall <- sum(!nay)
-  N <- ncol(y)
-  K <- nrow(y)
+  N <- ncol(y) # NO.OF METABOLITES
+  K <- nrow(y) # NO.OF STUDIES
   q <- p <- 1
+  # USER INPUTS
   method <- match.arg(method)
   bscov <- match.arg(bscov)
+  # IMPUTE MISSING
   if(impute.na){
     data <- low.weight(y,Slist,impute.var)
     y <- data$effects
     Slist <- data$wscovar
+    # CHECK POSITIVE DEFINITENESS
     for (k in 1:K) {
       if (!is.positive.definite(Slist[[k]])) {
         Slist[[k]] <- as.matrix(nearPD(Slist[[k]],keepDiag = TRUE,maxit = 500)$mat)
@@ -43,15 +48,20 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
     }
     nay[nay] <-FALSE
   }
+  # IF Slist CONTAINS MISSINGS GENERATE AN ERROR
   if (any(sapply(Slist, function(x) any(is.na(x))))){
     stop("Error: Slist contains missing values.")
   }
+  # CONVERTS EACH MATRIX IN Slist INTO A VECTOR BY EXTRACTING LOWER TRIANGULAR ELEMENTS AND TRANSPOSES THE RESULT
   S <- t(sapply(Slist,vechMatrix))
   rep <- matrix(rep(1,K),nrow = K,ncol = 1)
   nalist <- lapply(1:K, function(j) nay[j,])
+  # TRANSFORM y, VECTORIZING THEM BY ROW
   ylist <- lapply(seq(K), function(i) c(t(y[i,]))[!nalist[[i]]])
   X <- matrix(1,nrow = K,ncol = 1)
+  # TRANSFORM X
   Xlist <- lapply(seq(K), function(i) (X[i, , drop = FALSE] %x% diag(N))[!nalist[[i]], , drop = FALSE])
+  # COMPUTE I2 STATISTIC
   gls <- glsfit(Xlist, ylist, Slist, onlycoef = FALSE)
   Q <- drop(crossprod(gls$invtUy - gls$invtUX %*% gls$coef))
   df <- nall-N
@@ -63,10 +73,13 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
   }
   I2 <- pmax((Q - df)/Q * 100, 0)
   if(is.null(Psi)){
+    # SET INTIAL Psi IF NULL
     Psi <- diag(0.001, nrow = N, ncol = N)
+    # ESTIMATE PSI 
     if (method == "reml"){
       psi_var <- estimateBSVar(Psi, Xlist, Zlist = NULL, ylist, Slist, nalist, rep, N, q, nall,rigls.maxiter)
       if(bscov == "unstructured"){
+        # IMPUTE Y FOR ESTIMATING BETWEEN-STUDY CORRELATIONS
         if(impute.na){
           y.imp <- Y
           for (i in 1:N){
@@ -84,8 +97,10 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
       psi <- diag(0, nrow = N , ncol = N)
     }
   }else{
+    # KNOWN PSI : USER INPUT
     psi <- Psi
   }
+  # OBTAIN COMBINED ESTIMATES AND STANDARD ERRORS
   A <- matrix(0, ncol = N, nrow = N)
   B <- matrix(0, nrow = N)
   for(k in 1:K) {
