@@ -5,4 +5,4 @@ and between studies, handles missing values and uses shrinkage estimation to all
 
 # Installation
 
-`devtools::install_github("metaanalysisR/MetaHD")`
+```devtools::install_github("metaanalysisR/MetaHD")```
