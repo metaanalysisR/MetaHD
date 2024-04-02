@@ -1,23 +1,25 @@
 ## Necessary librarires
-#library(readxl)
 #library(tidyr)
 #library(Matrix)
 #library(matrixcalc)
 #library(corpcor)
+#library(MetaHD)
+
 ################################################# EXAMPLE 1 ################################################################
 ### APPLICATION TO REAL DATA ###
 
-# Read the data
-GCLC_data <- read_excel("GC-LC_data.xlsx",sheet = "GC-LC_data")
-Effects <- read_excel("GC-LC_data.xlsx", sheet = "Effect_sizes")
-Variances <- read_excel("GC-LC_data.xlsx", sheet = "Associated_variances")
+# Load the data
+data(realdata)
+GCLC_data <- realdata$all
+Effects <- realdata$effects
+Variances <- realdata$var
 
 # Creating within-study covariance matrices
 study <- unique(GCLC_data$Study)
 K <- length(study)
 var_df <- data.frame(Variances, study=study)
 var_df_long <- gather(var_df, metabolite, var_est,
-                      Cysteine:Valine,
+                      met1:met14,
                       factor_key=TRUE)
 sd_split <- split(sqrt(var_df_long$var_est),var_df_long$study)
 
@@ -46,11 +48,13 @@ model$estimate
 
 ## COMPLETE DATA EXAMPLE ##
 
-# Read the data
-Effects <- read_excel("simulated_data_1.xlsx", sheet = "effect_sizes")
-WSVar <- read_excel("simulated_data_1.xlsx", sheet = "within-study_variances")
-WSCorr <- read_excel("simulated_data_1.xlsx", sheet = "within-study_correlations") # UPPER TRIANGULAR ELEMENTS
-K <- nrow(Effects)
+# Load the data
+data(simdata.1)
+Effects <- simdata.1$effects
+WSVar <- simdata.1$wsvar
+WSCor <- simdata.1$wscor # Upper traingular elements
+
+K <- nrow(Effects) # no. of studies
 var_names <- colnames(Effects)
 
 # Creating within-study covariance matrices
@@ -80,12 +84,14 @@ model_1$estimate # TRUE VALUES ARE: 5, 1, 3, 2, 4, 2, 1, 1, 5, 1, 1, 5, 5, 2, 3,
 ################################################# EXAMPLE 3 ################################################################
 ## IN THE PRESENCE OF MISSING VALUES ##
 
-# Read the data
-Effects <- read_excel("simulated_data_2.xlsx", sheet = "effect_sizes")
-WSVar <- read_excel("simulated_data_2.xlsx", sheet = "within-study_variances")
-WSCorr <- read_excel("simulated_data_2.xlsx", sheet = "within-study_correlations") # UPPER TRIANGULAR ELEMENTS
-K <- nrow(Effects)
-N <- ncol(Effects)
+# Load the data
+data(simdata.2)
+Effects <- simdata.2$effects
+WSVar <- simdata.2$wsvar
+WSCor <- simdata.2$wscor # Upper traingular elements
+
+K <- nrow(Effects) # no.of studies
+N <- ncol(Effects) # no.of metabolites
 var_names <- colnames(Effects)
 
 # Creating within-study covariance matrices
