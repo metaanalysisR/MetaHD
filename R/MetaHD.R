@@ -3,22 +3,22 @@
 # library(Matrix)
 # library(matrixcalc)
 
-## The function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation. 
-# Assuming a meta-analysis is based on N outcomes/metabolites and K studies:
-# @param Y : treatment effect sizes of the outcomes. This should be in the form of a K x N matrix
-# @param Slist : K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects
-# @param Psi : N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package
-# @param shrinkCor : a logical value indicating whether a shrinkage estimator should be used to estimate between-study correlation matrix. Default is TRUE
-# @param method : estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood
-# @param bscov : a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances
-# @param rigls.maxiter : maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 5
-# @param impute.na : a logical value indicating whether missing values need to be imputed or not. Default is FALSE
-# @param impute.var : multiplier for replacing the missing variances in Slist.(a large value, default is 10^4
+#' The function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation. 
+#' Assuming a meta-analysis is based on N outcomes/metabolites and K studies:
+#' @param Y : treatment effect sizes of the outcomes. This should be in the form of a K x N matrix
+#' @param Slist : K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects
+#' @param Psi : N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package
+#' @param shrinkCor : a logical value indicating whether a shrinkage estimator should be used to estimate between-study correlation matrix. Default is TRUE
+#' @param method : estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood
+#' @param bscov : a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances
+#' @param rigls.maxiter : maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 5
+#' @param impute.na : a logical value indicating whether missing values need to be imputed or not. Default is FALSE
+#' @param impute.var : multiplier for replacing the missing variances in Slist.(a large value, default is 10^4
 
-# @return A list of objects containing:
-  # estimate : a N-dimensional vector of the combined estimates
-  # std.err : a N-dimensional vector of the associated standard errors
-  # I2.stat : I2 statistic
+#' @return A list of objects containing:
+#' estimate : a N-dimensional vector of the combined estimates
+#' std.err : a N-dimensional vector of the associated standard errors
+#' I2.stat : I2 statistic
 
 MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 5,impute.na = FALSE,impute.var = 10^4){
   # ENSURING Y IS A MATRIX
