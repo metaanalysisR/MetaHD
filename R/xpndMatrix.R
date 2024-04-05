@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 xpndMatrix <- function (vech){
   dim <- (-1 + sqrt(1 + 8 * length(vech)))/2
   if (dim%%1 != 0L){
