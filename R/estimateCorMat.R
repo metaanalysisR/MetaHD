@@ -1,5 +1,5 @@
-## Necessary libraries
-# library(corpcor) #cor.shrink()
+# LOAD LIBRARIES
+library(corpcor) #cor.shrink()
 
 estimateCorMat <- function(Y,shrinkCor=TRUE){
   N <- ncol(Y) # NO.OF METABOLITES/OUTCOMES
