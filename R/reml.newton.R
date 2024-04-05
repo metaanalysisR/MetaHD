@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 reml.newton <- function (Psi, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nall, const) {
   par <- log(diag(Psi))
   fn <- reml.loglik.fn
