@@ -20,6 +20,11 @@
 #' std.err : a N-dimensional vector of the associated standard errors
 #' I2.stat : I2 statistic
 
+# LOAD LIBRARIES
+library(corpcor) #cor.shrink()
+library(Matrix) #nearPD()
+library(matrixcalc) #is.positive.definite()
+
 MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 5,impute.na = FALSE,impute.var = 10^4){
   # ENSURING Y IS A MATRIX
   y <- Y
