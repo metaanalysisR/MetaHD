@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 vechMatrix <- function (mat, diag = TRUE){
   if (!is.matrix(mat)){
     mat <- as.matrix(mat)
