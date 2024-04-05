@@ -52,16 +52,13 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
   if (any(sapply(Slist, function(x) any(is.na(x))))){
     stop("Error: Slist contains missing values.")
   }
-  # CONVERTS EACH MATRIX IN Slist INTO A VECTOR BY EXTRACTING LOWER TRIANGULAR ELEMENTS AND TRANSPOSES THE RESULT
-  S <- t(sapply(Slist,vechMatrix))
+  S <- t(sapply(Slist,vechMatrix)) # CONVERTS EACH MATRIX IN Slist INTO A VECTOR BY EXTRACTING LOWER TRIANGULAR ELEMENTS AND TRANSPOSES THE RESULT
   rep <- matrix(rep(1,K),nrow = K,ncol = 1)
   nalist <- lapply(1:K, function(j) nay[j,])
-  # TRANSFORM y, VECTORIZING THEM BY ROW
-  ylist <- lapply(seq(K), function(i) c(t(y[i,]))[!nalist[[i]]])
+  ylist <- lapply(seq(K), function(i) c(t(y[i,]))[!nalist[[i]]]) # TRANSFORM y, VECTORIZING THEM BY ROW
   X <- matrix(1,nrow = K,ncol = 1)
-  # TRANSFORM X
-  Xlist <- lapply(seq(K), function(i) (X[i, , drop = FALSE] %x% diag(N))[!nalist[[i]], , drop = FALSE])
-  # COMPUTE I2 STATISTIC
+  Xlist <- lapply(seq(K), function(i) (X[i, , drop = FALSE] %x% diag(N))[!nalist[[i]], , drop = FALSE]) # TRANSFORM X
+  # COMPUTE I2 STATISTIC : code adapted from library(mixmeta)
   gls <- glsfit(Xlist, ylist, Slist, onlycoef = FALSE)
   Q <- drop(crossprod(gls$invtUy - gls$invtUX %*% gls$coef))
   df <- nall-N
