@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 reml.loglik.fn <- function (par, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nall, const){
   d <- N*q
   Psi <- diag(exp(par), d)
