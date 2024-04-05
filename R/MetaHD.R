@@ -1,7 +1,7 @@
 ## Necessary libraries
-# library(corpcor)
-# library(Matrix)
-# library(matrixcalc)
+# library(corpcor) #cor.shrink()
+# library(Matrix) #nearPD()
+# library(matrixcalc) #is.positive.definite()
 
 #' The function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation. 
 #' Assuming a meta-analysis is based on N outcomes/metabolites and K studies:
