@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 rigls.iter <- function (Psi, Qlist, Xlist, Zlist, ylist, Slist, nalist, rep, N, q){
   Sigmalist <- getSigmaList(Zlist, nalist, Psi, Slist)
   gls <- glsfit(Xlist, ylist, Sigmalist, onlycoef = FALSE)
