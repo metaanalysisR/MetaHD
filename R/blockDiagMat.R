@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 blockDiagMat <- function (x){
   if (is.matrix(x))
     return(x)
