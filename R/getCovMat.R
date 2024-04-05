@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 getCovMat <- function (sd, cor = NULL) {
   if (is.null(cor))
     cor <- 0
