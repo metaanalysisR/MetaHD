@@ -1,4 +1,4 @@
-# Some parts of the code are adapted from library(mixmeta)
+# Code adapted from library(mixmeta)
 
 estimateBSVar <- function (Psi, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nall,rigls.maxiter) {
   const <- -0.5 * (nall - ncol(Xlist[[1L]])) * log(2 * pi) + sum(log(diag(chol(sumList(lapply(Xlist, crossprod))))))
