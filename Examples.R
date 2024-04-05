@@ -1,9 +1,9 @@
-## Necessary librarires
-#library(tidyr)
-#library(Matrix)
-#library(matrixcalc)
-#library(corpcor)
-#library(MetaHD)
+# LOAD LIBRARIES
+library(tidyr)
+library(Matrix)
+library(matrixcalc)
+library(corpcor)
+library(MetaHD)
 
 ################################################# EXAMPLE 1 ################################################################
 ### APPLICATION TO REAL DATA ###
