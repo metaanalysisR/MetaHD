@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 getSigmaList <- function (Zlist, nalist, Psi, Slist){
   if (is.null(Psi))
     return(Slist)
