@@ -1,4 +1,4 @@
-# 
+# Codes adapted from library(mixmeta)
 
 sumList <- function (list){
   res <- 0
