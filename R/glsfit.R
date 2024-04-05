@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 glsfit <- function (Xlist, ylist, Sigmalist, onlycoef = TRUE){
   Ulist <- lapply(Sigmalist, chol)
   invUlist <- lapply(Ulist, function(U) backsolve(U, diag(ncol(U))))
