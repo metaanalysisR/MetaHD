@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 getQlist <- function (Zlist, nalist, rep, N, q){
   if (is.null(Zlist))
     Zlist <- lapply(nalist, function(na) list(list(diag(length(na))[!na, , drop = FALSE])))
