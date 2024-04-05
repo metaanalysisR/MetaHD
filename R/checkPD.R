@@ -1,3 +1,5 @@
+# Code adapted from library(mixmeta)
+
 checkPD <- function (x, set.negeigen = sqrt(.Machine$double.eps), force = TRUE, error = FALSE, label = "x") {
   x <- getList(x)
   x <- lapply(x, function(mat) {
