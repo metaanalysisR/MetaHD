@@ -142,6 +142,8 @@ low.weight <- function(Y,Slist,impute.var = 10^4){
               wscovar = Slist))
 }
 
+#' Following codes are adapted from library(mixmeta) to estimate between-study variances within MetaHD
+                  
 estimateBSVar <- function (Psi, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nall,rigls.maxiter) {
   const <- -0.5 * (nall - ncol(Xlist[[1L]])) * log(2 * pi) + sum(log(diag(chol(sumList(lapply(Xlist, crossprod))))))
   Qlist <- getQlist(Zlist, nalist, rep, N, q)
