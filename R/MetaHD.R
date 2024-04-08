@@ -291,6 +291,26 @@ blockDiagMat <- function (x){
   mat[ind] <- unlist(x)
   mat
 }
+
+sumList <- function (list){
+  res <- 0
+  for (i in seq(list)){
+    res <- res + list[[i]]
+  }
+  res
+}
+
+getList <- function (object){
+  if (is.list(object))
+    object
+  else list(object)
+}
+
+dropList <- function (object){
+  if (is.list(object) && length(object) == 1L)
+    object[[1L]]
+  else object
+}
                                                                                                       
 getCovMat <- function (sd, cor = NULL) {
   if (is.null(cor))
@@ -355,24 +375,4 @@ xpndMatrix <- function (vech){
   mat[lower.tri(mat, diag = TRUE)] <- as.matrix(vech)
   mat[upper.tri(mat)] <- t(mat)[upper.tri(mat)]
   return(mat)
-}
-
-sumList <- function (list){
-  res <- 0
-  for (i in seq(list)){
-    res <- res + list[[i]]
-  }
-  res
-}
-
-getList <- function (object){
-  if (is.list(object))
-    object
-  else list(object)
-}
-
-dropList <- function (object){
-  if (is.list(object) && length(object) == 1L)
-    object[[1L]]
-  else object
 }
