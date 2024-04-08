@@ -17,8 +17,8 @@ low.weight(Y, Slist, impute.var=10^4)
 }
 \value{
 The \code{low.weight} function returns a list of objects:
-  \item{effects}{a K \eqn{\times} N matrix corresponding to the augmented outcomes.}
-  \item{wscovar}{a K-dimensional list of N \eqn{\times} N matrices corresponding to the augmented within-study variances and covariances of the treatment effects.}
+  \item{effects}{a K \eqn{\times} N matrix corresponding to the augmented outcomes}
+  \item{wscovar}{a K-dimensional list of N \eqn{\times} N matrices corresponding to the augmented within-study variances and covariances of the treatment effects}
 }
 \references{
 }
