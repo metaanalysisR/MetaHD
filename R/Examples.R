@@ -65,7 +65,7 @@ Sk_var_df_long_initial <- gather(Sk_var_df_initial, metabolite, var_est,
 Sk_sd_initial<- split(sqrt(Sk_var_df_long_initial$var_est),Sk_var_df_long_initial$study)
 Sk <- list()
 for (k in 1:K) {
-  Sk[[k]] <- getCovMat(Sk_sd_initial[[k]],WSCorr[k,])
+  Sk[[k]] <- getCovMat(Sk_sd_initial[[k]],WSCor[k,])
   if (!is.positive.definite(Sk[[k]])) {
     Sk[[k]] <- as.matrix(nearPD(Sk[[k]],keepDiag = TRUE,maxit = 500)$mat)
   }
@@ -102,7 +102,7 @@ Sk_var_df_long_initial <- gather(Sk_var_df_initial, metabolite, var_est,
 Sk_sd_initial<- split(sqrt(Sk_var_df_long_initial$var_est),Sk_var_df_long_initial$study)
 Sk <- list()
 for (k in 1:K) {
-  Sk[[k]] <- getCovMat(Sk_sd_initial[[k]],WSCorr[k,])
+  Sk[[k]] <- getCovMat(Sk_sd_initial[[k]],WSCor[k,])
 }
 
 Y <- as.matrix(Effects)
