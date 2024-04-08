@@ -7,6 +7,7 @@ Author:
            family = "Liyanage",
            role = c("aut", "cre"),
            email = "j.liyanage@latrobe.edu.au")
+           comment = c(ORCID = "0009-0004-8276-8191"))
     person(given = "Alysha",
            family = "De Livera",
            role = c("aut", "cre"),
