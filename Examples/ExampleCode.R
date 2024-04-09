@@ -118,7 +118,7 @@ model_2$estimate # TRUE VALUES ARE: 5, 1, 3, 2, 4, 2, 1, 1, 5, 1, 1, 5, 5, 2, 3,
 
 ## UNIVARIATE RANDOM-EFFECTS META-ANALYSIS
 est <- c()
-for (i in 1:N) {
+for (i in 1:dim(Y)[2]) {
   model_3 <- MetaHD(Y = na.omit(Y[,i]),
                     Slist = unlist(apply(na.omit(as.matrix(WSVar[,i])), MARGIN = 1, FUN = list), recursive = FALSE),
                     method = "reml",
