@@ -5,6 +5,8 @@ This package performs multivariate meta-analysis for high-dimensional metabolomi
 # Installation
 
 ```{r eval=FALSE}
+# install.packages("devtools")
+library(devtools)
 devtools::install_github("metaanalysisR/MetaHD")
 ```
 
