@@ -3,7 +3,7 @@ library(tidyr)
 library(Matrix)
 library(matrixcalc)
 library(corpcor)
-library(MetaHD)
+#library(MetaHD)
 
 ################################################# EXAMPLE 1 ################################################################
 ### APPLICATION TO REAL DATA ###
