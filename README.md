@@ -7,3 +7,8 @@ This package performs multivariate meta-analysis for high-dimensional metabolomi
 ```{r eval=FALSE}
 devtools::install_github("metaanalysisR/MetaHD")
 ```
+
+# Examples
+
+R codes for example applications are given [here](R/Examples.R)
+
