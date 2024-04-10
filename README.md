@@ -14,3 +14,7 @@ devtools::install_github("metaanalysisR/MetaHD")
 
 R codes for example applications are given [here.](Examples/ExampleCode.R)
 
+
+# Pre-print
+
+Pre-print will be available here.
