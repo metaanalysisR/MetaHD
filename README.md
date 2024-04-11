@@ -15,6 +15,5 @@ devtools::install_github("metaanalysisR/MetaHD")
 R codes for example applications are given [here.](Examples/ExampleCode.R)
 
 
-# Pre-print
-
-Pre-print will be available here.
+# To cite
+Liyanage, Jayamini, Prendergast, Luke, Staudte Robert, De Livera, Alysha “MetaHD: A multivariate meta-analysis model for metabolomics data” Submitted for review (2024)- article available on request to authors.
