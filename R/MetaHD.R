@@ -1,39 +1,37 @@
-## Necessary libraries
-# library(corpcor) #cor.shrink()
-# library(Matrix) #nearPD()
-# library(matrixcalc) #is.positive.definite()
-
-#' The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation. 
+#' A Multivariate Meta-Analysis Model for Metabolomics Data
+#'
+#' The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
 #' Assuming a meta-analysis is based on N outcomes/metabolites and K studies:
+#'
 #' @param Y : treatment effect sizes of the outcomes. This should be in the form of a K x N matrix
 #' @param Slist : K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects
 #' @param Psi : N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package
 #' @param shrinkCor : a logical value indicating whether a shrinkage estimator should be used to estimate between-study correlation matrix. Default is TRUE
 #' @param method : estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood
 #' @param bscov : a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances
-#' @param rigls.maxiter : maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 5
+#' @param rigls.maxiter : maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 1
 #' @param impute.na : a logical value indicating whether missing values need to be imputed or not. Default is FALSE
-#' @param impute.var : multiplier for replacing the missing variances in Slist.(a large value, default is 10^4
+#' @param impute.var : multiplier for replacing the missing variances in Slist.(a large value, default is 10^4)
 
-#' @return A list of objects containing:
-#' estimate : a N-dimensional vector of the combined estimates
-#' std.err : a N-dimensional vector of the associated standard errors
-#' I2.stat : I2 statistic
+#' @return A list of objects containing estimate : a N-dimensional vector of the combined estimates, std.err : a N-dimensional vector of the associated standard errors, pVal : a N-dimensional vector of the p-values, I2.stat : I2 statistic
+#' @export MetaHD
 
-# LOAD LIBRARIES
-library(corpcor) 
-library(Matrix) 
-library(matrixcalc) 
+#' @name MetaHD
+#' @useDynLib MetaHD, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+NULL
 
-MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 5,impute.na = FALSE,impute.var = 10^4){
+Rcpp::sourceCpp("src/cpp_XtVX.cpp")
+
+MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 1,impute.na = FALSE,impute.var = 10^4){
   y <- Y
   if (!is.matrix(y)){
     y <- as.matrix(y)
   }
   nay <- is.na(y)
   nall <- sum(!nay)
-  N <- ncol(y) 
-  K <- nrow(y) 
+  N <- ncol(y)
+  K <- nrow(y)
   q <- p <- 1
   method <- match.arg(method)
   bscov <- match.arg(bscov)
@@ -42,8 +40,8 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
     y <- data$effects
     Slist <- data$wscovar
     for (k in 1:K) {
-      if (!is.positive.definite(Slist[[k]])) {
-        Slist[[k]] <- as.matrix(nearPD(Slist[[k]],keepDiag = TRUE,maxit = 500)$mat)
+      if (!matrixcalc::is.positive.definite(Slist[[k]])) {
+        Slist[[k]] <- as.matrix(Matrix::nearPD(Slist[[k]],keepDiag = TRUE,maxit = 500)$mat)
       }
     }
     nay[nay] <-FALSE
@@ -51,12 +49,12 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
   if (any(sapply(Slist, function(x) any(is.na(x))))){
     stop("Error: Slist contains missing values.")
   }
-  S <- t(sapply(Slist,vechMatrix)) 
+  S <- t(sapply(Slist,vechMatrix))
   rep <- matrix(rep(1,K),nrow = K,ncol = 1)
   nalist <- lapply(1:K, function(j) nay[j,])
-  ylist <- lapply(seq(K), function(i) c(t(y[i,]))[!nalist[[i]]]) 
+  ylist <- lapply(seq(K), function(i) c(t(y[i,]))[!nalist[[i]]])
   X <- matrix(1,nrow = K,ncol = 1)
-  Xlist <- lapply(seq(K), function(i) (X[i, , drop = FALSE] %x% diag(N))[!nalist[[i]], , drop = FALSE]) 
+  Xlist <- lapply(seq(K), function(i) (X[i, , drop = FALSE] %x% diag(N))[!nalist[[i]], , drop = FALSE])
   gls <- glsfit(Xlist, ylist, Slist, onlycoef = FALSE)
   Q <- drop(crossprod(gls$invtUy - gls$invtUX %*% gls$coef))
   df <- nall-N
@@ -75,7 +73,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
         if(impute.na){
           y.imp <- Y
           for (i in 1:N){
-            y.imp[,i][is.na(Y[,i])] <- mean(na.omit(Y[,i]))
+            y.imp[,i][is.na(Y[,i])] <- mean(stats::na.omit(Y[,i]))
           }
         }else{
           y.imp <- y
@@ -99,8 +97,13 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
     val2 <- val1 %*% y[k,]
     B <- B + val2
   }
-  return(list(estimate = as.numeric(t(solve(A)%*%B)),
-              std.err = sqrt(diag(solve(A))),
+  estimate <- as.numeric(t(solve(A)%*%B))
+  std.err <- sqrt(diag(solve(A)))
+  zval <- estimate/std.err
+  pvalue <- 2 * (1 - stats::pnorm(abs(zval)))
+  return(list(estimate = estimate,
+              std.err = std.err,
+              pVal = pvalue,
               I2.stat = I2))
 }
 
@@ -112,12 +115,12 @@ estimateCorMat <- function(Y,shrinkCor = TRUE){
   }else {
     if (N > K){
       if(shrinkCor){
-        cormat <- cor.shrink(Y,verbose = FALSE)[1:N,1:N]
+        cormat <- corpcor::cor.shrink(Y,verbose = FALSE)[1:N,1:N]
       }else{
-        cormat <- cor(Y)
+        cormat <- stats::cor(Y)
       }
     }else{
-      cormat <- cor(Y)
+      cormat <- stats::cor(Y)
     }
   }
   return(cormat)
@@ -142,8 +145,8 @@ low.weight <- function(Y,Slist,impute.var = 10^4){
               wscovar = Slist))
 }
 
-#' Following codes are adapted from library(mixmeta) to estimate between-study variances within MetaHD
-                  
+# Following codes are adapted from library(mixmeta) to estimate between-study variances within MetaHD
+
 estimateBSVar <- function (Psi, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nall,rigls.maxiter) {
   const <- -0.5 * (nall - ncol(Xlist[[1L]])) * log(2 * pi) + sum(log(diag(chol(sumList(lapply(Xlist, crossprod))))))
   Qlist <- getQlist(Zlist, nalist, rep, N, q)
@@ -171,10 +174,9 @@ rigls.iter <- function (Psi, Qlist, Xlist, Zlist, ylist, Slist, nalist, rep, N, 
   Blist <- lapply(seq(flist), function(i) flist[[i]] %*% invSigmalist[[i]])
   ind1 <- unlist(lapply(seq(Qlist[[1L]]), ":", length(Qlist[[1L]])))
   ind2 <- rep(seq(Qlist[[1L]]), rev(seq(Qlist[[1L]])))
-  XtVX <- xpndMatrix(sapply(seq(ind1), function(k) sum(sapply(seq(Qlist),
-                                                           function(i) sum(diag(Alist[[i]][[ind1[k]]] %*% Alist[[i]][[ind2[k]]]))))))
-  XtVy <- sapply(seq(Qlist[[1L]]), function(k) sum(sapply(seq(Qlist),
-                                                          function(i) sum(diag(Alist[[i]][[k]] %*% Blist[[i]])))))
+  cpp_result <- cpp_XtVX(Qlist, Alist, ind1, ind2)
+  XtVX <- xpndMatrix(cpp_result)
+  XtVy <- sapply(seq(Qlist[[1L]]), function(k) sum(sapply(seq(Qlist), function(i) sum(diag(Alist[[i]][[k]] %*% Blist[[i]])))))
   par <- as.numeric(chol2inv(chol(XtVX)) %*% XtVy)
   Psi <- lapply(lapply(seq_along(q), function(j) par[seq(c(0,
                                                            cumsum(q * N * (q * N + 1)/2))[j] + 1, cumsum(q * N *
@@ -202,7 +204,7 @@ reml.newton <- function (Psi, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nal
   par <- log(diag(Psi))
   fn <- reml.loglik.fn
   gr <- NULL
-  opt <- optim(par = par, fn = fn, gr = gr, Xlist = Xlist,
+  opt <- stats::optim(par = par, fn = fn, gr = gr, Xlist = Xlist,
                Zlist = Zlist, ylist = ylist, Slist = Slist, nalist = nalist,
                rep = rep, N = N, q = q, nall = nall, const = const, method = "BFGS",
                control = list(fnscale=-1, maxit=100, reltol=sqrt(.Machine$double.eps)), hessian = FALSE)
@@ -225,6 +227,13 @@ reml.loglik.fn <- function (par, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, 
 
 glsfit <- function (Xlist, ylist, Sigmalist, onlycoef = TRUE){
   Ulist <- lapply(Sigmalist, chol)
+  Ulist <- mapply(function(U) {
+    if (det(U) == 0) {
+      diag_mat <- diag(1e-10, nrow = nrow(U))
+      U <- U + diag_mat
+    }
+    return(U)
+  }, Ulist, SIMPLIFY = FALSE)
   invUlist <- lapply(Ulist, function(U) backsolve(U, diag(ncol(U))))
   invtUXlist <- mapply(function(invU, X) crossprod(invU, X),
                        invUlist, Xlist, SIMPLIFY = FALSE)
@@ -272,7 +281,7 @@ getSigmaList <- function (Zlist, nalist, Psi, Slist){
   Psi <- getList(Psi)
   lapply(seq_along(Zlist), function(i) sumList(lapply(seq_along(Psi), function(j) blockDiagMat(lapply(Zlist[[i]][[j]], function(x) x %*% Psi[[j]] %*% t(x))))) + Slist[[i]])
 }
-                                                                                                      
+
 blockDiagMat <- function (x){
   if (is.matrix(x))
     return(x)
@@ -311,7 +320,7 @@ dropList <- function (object){
     object[[1L]]
   else object
 }
-                                                                                                      
+
 getCovMat <- function (sd, cor = NULL) {
   if (is.null(cor))
     cor <- 0
