@@ -2,31 +2,20 @@ Package: MetaHD
 Type: Package
 Title: A Multivariate Meta-Analysis Model for Metabolomics Data
 Version: 0.1.0
-Authors@R: 
-    	person(given = "Alysha",
-           family = "De Livera",
-           role = c("aut", "cre"),
-           email = "a.delivera@latrobe.edu.au",
-           comment = c(ORCID = "0000-0003-4981-4155"))
-      person(given = "Jayamini",
-           family = "Liyanage",
-           role = c("aut", "cre"),
-           email = "j.liyanage@latrobe.edu.au",
-           comment = c(ORCID = "0009-0004-8276-8191"))
+Authors@R: c(
+  person("Jayamini","Liyanage",role=c("aut","cre"),email="j.liyanage@latrobe.edu.au"),
+  person("Alysha","De Livera",role="aut",email="a.delivera@latrobe.edu.au"))
 Maintainer: Jayamini Liyanage <j.liyanage@latrobe.edu.au>
-Description: The package performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
+Author: Jayamini Liyanage [aut, cre], Alysha De Livera [aut]
+Description: Performs multivariate meta-analysis for high-dimensional metabolomics data for integrating and collectively analysing individual-level metabolomics data generated from multiple studies as well as for combining summary estimates. This approach accounts for correlation between metabolites, considers variability within and between studies, handles missing values and uses shrinkage estimation to allow for high dimensionality.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports: corpcor, Matrix, matrixcalc, Rcpp (>= 1.0.0)
-Suggests:
-    knitr,
-    rmarkdown
 LinkingTo:
     Rcpp,
     RcppArmadillo
-VignetteBuilder: knitr
 
 
