@@ -10,9 +10,9 @@ library(devtools)
 devtools::install_github("metaanalysisR/MetaHD")
 ```
 
-# Examples
+# Vignette
 
-R codes for example applications are given [here.](Examples/ExampleCode.R)
+
 
 
 # To cite
