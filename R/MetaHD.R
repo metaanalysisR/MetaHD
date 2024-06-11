@@ -19,9 +19,16 @@
 #' @name MetaHD
 #' @useDynLib MetaHD, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
+#' @importFrom matrixcalc is.positive.definite
+#' @importFrom Matrix nearPD
+#' @importFrom stats na.omit cor optim pnorm
+#' @importFrom corpcor cor.shrink
+#' @importFrom dplyr %>% group_by summarise across everything arrange desc all_of
+#' @importFrom metafor escalc
+#' @importFrom tidyr gather
 NULL
 
-Rcpp::sourceCpp("src/cpp_XtVX.cpp")
+sourceCpp("src/cpp_XtVX.cpp")
 
 MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 1,impute.na = FALSE,impute.var = 10^4){
   y <- Y
@@ -40,8 +47,8 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
     y <- data$effects
     Slist <- data$wscovar
     for (k in 1:K) {
-      if (!matrixcalc::is.positive.definite(Slist[[k]])) {
-        Slist[[k]] <- as.matrix(Matrix::nearPD(Slist[[k]],keepDiag = TRUE,maxit = 500)$mat)
+      if (!is.positive.definite(Slist[[k]])) {
+        Slist[[k]] <- as.matrix(nearPD(Slist[[k]],keepDiag = TRUE,maxit = 500)$mat)
       }
     }
     nay[nay] <-FALSE
@@ -73,7 +80,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
         if(impute.na){
           y.imp <- Y
           for (i in 1:N){
-            y.imp[,i][is.na(Y[,i])] <- mean(stats::na.omit(Y[,i]))
+            y.imp[,i][is.na(Y[,i])] <- mean(na.omit(Y[,i]))
           }
         }else{
           y.imp <- y
@@ -100,11 +107,65 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
   estimate <- as.numeric(t(solve(A)%*%B))
   std.err <- sqrt(diag(solve(A)))
   zval <- estimate/std.err
-  pvalue <- 2 * (1 - stats::pnorm(abs(zval)))
+  pvalue <- 2 * (1 - pnorm(abs(zval)))
   return(list(estimate = estimate,
               std.err = std.err,
               pVal = pvalue,
               I2.stat = I2))
+}
+
+#' @export MetaHDInput
+#'
+MetaHDInput <- function(data){
+  names(data)[1:2] <- c("study", "group")
+  study <- unique(data$study)
+  group <- unique(data$group)
+  sum_data <- data %>% group_by(study, group) %>%
+              summarise(across(everything(), list(Mean = ~mean(.), Sd = ~sd(.), N = ~length(.)), .names = "{fn}_{col}"),.groups = "drop") %>%
+              arrange(desc(group))
+  stat_data <- as.data.frame(sum_data[-c(1,2)])
+  N <- (ncol(stat_data))/3
+  K <- length(study)
+  var_names <- names(data[-c(1,2)])
+  meta.data <- list()
+  for (i in 1:N) {
+    mean_col <- (i - 1) * 3 + 1
+    sd_col <- mean_col + 1
+    n_col <- mean_col + 2
+    meta.data[[i]] <- escalc(measure = "ROM",
+                             m1i = stat_data[1:K, mean_col],
+                             m2i = stat_data[(K+1):(2*K), mean_col],
+                             n1i = stat_data[1:K, n_col],
+                             n2i = stat_data[(K+1):(2*K), n_col],
+                             sd1i = stat_data[1:K, sd_col],
+                             sd2i = stat_data[(K+1):(2*K), sd_col],
+                             append = FALSE)
+  }
+  effects <- list()
+  variances <- list()
+  for (i in 1:N) {
+    effects[[i]] <- meta.data[[i]][1]
+    variances[[i]] <- meta.data[[i]][2]
+  }
+  Effects <- as.data.frame(effects)
+  Variances <- as.data.frame(variances)
+  names(Effects) <- var_names
+  names(Variances) <- var_names
+  var_df <- data.frame(Variances, study=study)
+  var_df_long <- gather(var_df, key = "metabolite", value = "var_est", all_of(var_names), factor_key=TRUE)
+  sd_split <- split(sqrt(var_df_long$var_est),var_df_long$study)
+  Sk <- list()
+  wscormat.shrink <- list()
+  split_data <- split(data,data$study)
+  for (k in 1:K) {
+    wscormat.shrink[[k]] <- estimateCorMat(log(split_data[[k]][,3:(N+2)]))
+    Sk[[k]] <- getCovMat(sd_split[[k]],wscormat.shrink[[k]])
+    if (!is.positive.definite(Sk[[k]])) {
+      Sk[[k]] <- as.matrix(nearPD(Sk[[k]],keepDiag = TRUE)$mat)
+    }
+  }
+  return(list(Y = as.matrix(Effects),
+              Slist = Sk))
 }
 
 estimateCorMat <- function(Y,shrinkCor = TRUE){
@@ -115,12 +176,12 @@ estimateCorMat <- function(Y,shrinkCor = TRUE){
   }else {
     if (N > K){
       if(shrinkCor){
-        cormat <- corpcor::cor.shrink(Y,verbose = FALSE)[1:N,1:N]
+        cormat <- cor.shrink(Y,verbose = FALSE)[1:N,1:N]
       }else{
-        cormat <- stats::cor(Y)
+        cormat <- cor(Y)
       }
     }else{
-      cormat <- stats::cor(Y)
+      cormat <- cor(Y)
     }
   }
   return(cormat)
@@ -204,7 +265,7 @@ reml.newton <- function (Psi, Xlist, Zlist, ylist, Slist, nalist, rep, N, q, nal
   par <- log(diag(Psi))
   fn <- reml.loglik.fn
   gr <- NULL
-  opt <- stats::optim(par = par, fn = fn, gr = gr, Xlist = Xlist,
+  opt <- optim(par = par, fn = fn, gr = gr, Xlist = Xlist,
                Zlist = Zlist, ylist = ylist, Slist = Slist, nalist = nalist,
                rep = rep, N = N, q = q, nall = nall, const = const, method = "BFGS",
                control = list(fnscale=-1, maxit=100, reltol=sqrt(.Machine$double.eps)), hessian = FALSE)
