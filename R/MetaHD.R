@@ -117,6 +117,16 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
 #' @export MetaHDInput
 #'
 MetaHDInput <- function(data){
+  data <- as.data.frame(data)
+  if (!is.character(data[, 1]) || !is.character(data[, 2])) {
+    stop("The first two columns must contain the study names and the groups to which the samples belong, respectively.")
+  }
+  if(length(unique(data[,1])) < 2){
+    stop("Require at least two studies to prepare input data for the meta-analysis.\nEnsure that the first column contains the study names, the second column contains the groups.")
+  }
+  if(length(unique(data[,2]))!=2){
+    stop("Restrict to two groups only.\nEnsure that the first column contains the study names, the second column contains the groups.")
+  }
   names(data)[1:2] <- c("study", "group")
   study <- unique(data$study)
   group <- unique(data$group)
