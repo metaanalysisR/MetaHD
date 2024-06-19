@@ -159,8 +159,10 @@ MetaHDInput <- function(data){
   }
   Effects <- as.data.frame(effects)
   Variances <- as.data.frame(variances)
-  names(Effects) <- var_names
-  names(Variances) <- var_names
+  colnames(Effects) <- var_names
+  rownames(Effects) <- study
+  colnames(Variances) <- var_names
+  rownames(Variances) <- study
   var_df <- data.frame(Variances, study=study)
   var_df_long <- gather(var_df, key = "metabolite", value = "var_est", all_of(var_names), factor_key=TRUE)
   sd_split <- split(sqrt(var_df_long$var_est),var_df_long$study)
@@ -170,6 +172,7 @@ MetaHDInput <- function(data){
   for (k in 1:K) {
     wscormat.shrink[[k]] <- estimateCorMat(log(split_data[[k]][,3:(N+2)]))
     Sk[[k]] <- getCovMat(sd_split[[k]],wscormat.shrink[[k]])
+    rownames(Sk[[k]]) <- colnames(Sk[[k]]) <- var_names
     if (!is.positive.definite(Sk[[k]])) {
       Sk[[k]] <- as.matrix(nearPD(Sk[[k]],keepDiag = TRUE)$mat)
     }
