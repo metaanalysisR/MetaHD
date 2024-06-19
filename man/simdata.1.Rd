@@ -5,21 +5,23 @@
 Simulated Dataset 1 : With Complete Data
 }
 \description{
-This dataset consists of a list of three data frames containing treatment effect estimates, within-study variances and upper trainangular elements of the within-study correlation matrices.
+This dataset consists of a list of two data frames containing treatment effect-sizes and within-study covariance matrices
 }
 \usage{simdata.1}
 \format{
    A list of data frames as follows:
   \describe{
-    \item{\code{effects}}{A dataframe with 12 rows and 30 columns, containing simulated treatment effect estimates of 30 metabolites for 12 studies.}
-    \item{\code{wsvar}}{A dataframe with 12 rows and 30 columns, containing simulated within-study variances of 30 metabolites for 12 studies.}
-    \item{\code{wscor}}{A dataframe with 12 rows and 435 columns, containing the upper traingular elements of simulated within-study correlation matrices for 12 studies.}
+    \item{\code{Y}}{treatment effect sizes of the metabolites in the form of a 12 x 30 matrix, where 12 is the number of studies and 30 is the number of metabolites.}
+    \item{\code{Slist}}{12-dimensional list of 30 x 30 matrices representing within-study variances and covariances of the treatment effects}
   }
 }
 
 \examples{
-head(simdata.1$effects)
-head(simdata.1$wsvar)
-head(simdata.1$wscor)
+Y <- simdata.1$Y
+Slist <- simdata.1$Slist
+
+head(Y)
+head(Slist[[1]])
+head(Slist[[12]])
 }
 \keyword{datasets}
