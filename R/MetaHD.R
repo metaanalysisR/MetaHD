@@ -3,13 +3,25 @@
 #' The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
 #' Assuming a meta-analysis is based on N outcomes/metabolites and K studies:
 #'
+#' @usage MetaHD(
+#'   Y, Slist,
+#'   Psi = NULL,
+#'   method = c("reml", "fixed"),
+#'   bscov = c("unstructured", "diag"),
+#'   rigls.maxiter = 1,
+#'   est.wscor = FALSE,
+#'   shrinkCor = TRUE,
+#'   impute.na = FALSE,
+#'   impute.var = 10^4
+#' )
 #' @param Y : treatment effect sizes of the outcomes. This should be in the form of a K x N matrix
-#' @param Slist : K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects
+#' @param Slist : K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, input associated variances of treatment effects in the form of a K x N matrix and set est.wscor = TRUE.
 #' @param Psi : N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package
-#' @param shrinkCor : a logical value indicating whether a shrinkage estimator should be used to estimate between-study correlation matrix. Default is TRUE
 #' @param method : estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood
 #' @param bscov : a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances
 #' @param rigls.maxiter : maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 1
+#' @param est.wscor : a logical value indicating whether the within-study correlation matrix needs to be estimated or not. Default is FALSE
+#' @param shrinkCor : a logical value indicating whether a shrinkage estimator should be used to estimate within- or between-study correlation matrix. Default is TRUE
 #' @param impute.na : a logical value indicating whether missing values need to be imputed or not. Default is FALSE
 #' @param impute.var : multiplier for replacing the missing variances in Slist.(a large value, default is 10^4)
 
@@ -30,7 +42,7 @@ NULL
 
 sourceCpp("src/cpp_XtVX.cpp")
 
-MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 1,impute.na = FALSE,impute.var = 10^4){
+MetaHD <- function(Y,Slist,Psi = NULL,method = c("reml","fixed"),bscov = c("unstructured","diag"),rigls.maxiter = 1,est.wscor = FALSE,shrinkCor = TRUE,impute.na = FALSE,impute.var = 10^4){
   y <- Y
   if (!is.matrix(y)){
     y <- as.matrix(y)
@@ -42,6 +54,25 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
   q <- p <- 1
   method <- match.arg(method)
   bscov <- match.arg(bscov)
+  if(est.wscor){
+    if(!is.list(Slist)){
+      WSVar <- Slist
+      WSVar <- as.matrix(WSVar)
+      nrows <- nrow(WSVar)
+      ncols <- ncol(WSVar)
+      if(nrows!=K && ncols!=N){
+        stop("Dimensions of within-study varaince matrix and Y are not consistent")
+      }
+      wscormat <- estimateCorMat(y,shrinkCor,impute.na)
+      Slist <- list()
+      for (k in 1:K) {
+        Slist[[k]] <- getCovMat(sqrt(WSVar[k,]),wscormat)
+      }
+    }else{
+      stop("Require within-study variances to be in the form of a K x N matrix, where K is the number of studies and N is the number of outcomes")
+    }
+
+  }
   if(impute.na){
     data <- low.weight(y,Slist,impute.var)
     y <- data$effects
@@ -77,15 +108,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,shrinkCor = TRUE,method = c("reml","fixed"
     if (method == "reml"){
       psi_var <- estimateBSVar(Psi, Xlist, Zlist = NULL, ylist, Slist, nalist, rep, N, q, nall,rigls.maxiter)
       if(bscov == "unstructured"){
-        if(impute.na){
-          y.imp <- Y
-          for (i in 1:N){
-            y.imp[,i][is.na(Y[,i])] <- mean(na.omit(Y[,i]))
-          }
-        }else{
-          y.imp <- y
-        }
-        cormat <- estimateCorMat(y.imp,shrinkCor)
+        cormat <- estimateCorMat(y,shrinkCor,impute.na)
         psi <- getCovMat(sqrt(psi_var),cormat)
       }else if(bscov == "diag"){
         psi <- diag(psi_var, nrow = N , ncol = N)
@@ -181,9 +204,16 @@ MetaHDInput <- function(data){
               Slist = Sk))
 }
 
-estimateCorMat <- function(Y,shrinkCor = TRUE){
+estimateCorMat <- function(Y,shrinkCor = TRUE,impute.na = FALSE){
   N <- ncol(Y)
   K <- nrow(Y)
+  if(impute.na){
+    for (i in 1:N){
+      Y[,i][is.na(Y[,i])] <- mean(na.omit(Y[,i]))
+    }
+  }else{
+    Y <- Y
+  }
   if (K <= 2){
     cormat <- 0
   }else {
