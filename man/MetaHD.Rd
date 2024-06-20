@@ -3,20 +3,35 @@
 \name{MetaHD}
 \alias{MetaHD}
 \title{A Multivariate Meta-Analysis Model for Metabolomics Data}
+\usage{
+MetaHD(
+  Y, Slist,
+  Psi = NULL,
+  method = c("reml", "fixed"),
+  bscov = c("unstructured", "diag"),
+  rigls.maxiter = 1,
+  est.wscor = FALSE,
+  shrinkCor = TRUE,
+  impute.na = FALSE,
+  impute.var = 10^4
+)
+}
 \arguments{
 \item{Y}{: treatment effect sizes of the outcomes. This should be in the form of a K x N matrix}
 
-\item{Slist}{: K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects}
+\item{Slist}{: K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, input associated variances of treatment effects in the form of a K x N matrix and set est.wscor = TRUE.}
 
 \item{Psi}{: N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package}
-
-\item{shrinkCor}{: a logical value indicating whether a shrinkage estimator should be used to estimate between-study correlation matrix. Default is TRUE}
 
 \item{method}{: estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood}
 
 \item{bscov}{: a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances}
 
 \item{rigls.maxiter}{: maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 1}
+
+\item{est.wscor}{: a logical value indicating whether the within-study correlation matrix needs to be estimated or not. Default is FALSE}
+
+\item{shrinkCor}{: a logical value indicating whether a shrinkage estimator should be used to estimate within- or between-study correlation matrix. Default is TRUE}
 
 \item{impute.na}{: a logical value indicating whether missing values need to be imputed or not. Default is FALSE}
 
