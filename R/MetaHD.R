@@ -161,6 +161,8 @@ MetaHDInput <- function(data){
   K <- length(study)
   var_names <- names(data[-c(1,2)])
   meta.data <- list()
+  effects <- list()
+  variances <- list()
   for (i in 1:N) {
     mean_col <- (i - 1) * 3 + 1
     sd_col <- mean_col + 1
@@ -173,10 +175,6 @@ MetaHDInput <- function(data){
                              sd1i = stat_data[1:K, sd_col],
                              sd2i = stat_data[(K+1):(2*K), sd_col],
                              append = FALSE)
-  }
-  effects <- list()
-  variances <- list()
-  for (i in 1:N) {
     effects[[i]] <- meta.data[[i]][1]
     variances[[i]] <- meta.data[[i]][2]
   }
@@ -186,7 +184,8 @@ MetaHDInput <- function(data){
   rownames(Effects) <- study
   colnames(Variances) <- var_names
   rownames(Variances) <- study
-  var_df <- data.frame(Variances, study=study)
+  var_df <- Variances
+  var_df$study <- study
   var_df_long <- gather(var_df, key = "metabolite", value = "var_est", all_of(var_names), factor_key=TRUE)
   sd_split <- split(sqrt(var_df_long$var_est),var_df_long$study)
   Sk <- list()
