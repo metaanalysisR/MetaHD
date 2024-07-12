@@ -139,7 +139,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,method = c("reml","fixed"),bscov = c("unst
 
 #' @export MetaHDInput
 #'
-MetaHDInput <- function(data){
+MetaHDInput <- function(data,isMissing = FALSE){
   data <- as.data.frame(data)
   if (!is.factor(data[, 1]) || !is.factor(data[, 2])) {
     stop("Require study and group names as factors in the first and second columns respectively.")
@@ -153,13 +153,22 @@ MetaHDInput <- function(data){
   names(data)[1:2] <- c("study", "group")
   study <- unique(data$study)
   group <- unique(data$group)
+  N <- ncol(data[-c(1,2)])
+  K <- length(study)
+  var_names <- names(data[-c(1,2)])
+  split_data <- split(data,data$study)
+  if(isMissing){
+    for (i in 1:N){
+      for (k in 1:K) {
+        split_data[[k]][,i+2][is.na(split_data[[k]][,i+2])] <- mean(na.omit(split_data[[k]][,i+2]))
+      }
+    }
+    data <- do.call(rbind, split_data)
+  }
   sum_data <- data %>% group_by(study, group) %>%
               summarise(across(everything(), list(Mean = ~mean(.), Sd = ~sd(.), N = ~length(.)), .names = "{fn}_{col}"),.groups = "drop") %>%
               arrange(desc(group))
   stat_data <- as.data.frame(sum_data[-c(1,2)])
-  N <- (ncol(stat_data))/3
-  K <- length(study)
-  var_names <- names(data[-c(1,2)])
   meta.data <- list()
   effects <- list()
   variances <- list()
@@ -186,11 +195,10 @@ MetaHDInput <- function(data){
   rownames(Variances) <- study
   var_df <- Variances
   var_df$study <- study
-  var_df_long <- gather(var_df, key = "metabolite", value = "var_est", all_of(var_names), factor_key=TRUE)
+  var_df_long <- gather(var_df, key = "outcome", value = "var_est", all_of(var_names), factor_key=TRUE)
   sd_split <- split(sqrt(var_df_long$var_est),var_df_long$study)
   Sk <- list()
   wscormat.shrink <- list()
-  split_data <- split(data,data$study)
   for (k in 1:K) {
     wscormat.shrink[[k]] <- estimateCorMat(log(split_data[[k]][,3:(N+2)]))
     Sk[[k]] <- getCovMat(sd_split[[k]],wscormat.shrink[[k]])
