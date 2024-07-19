@@ -5,21 +5,14 @@
 An Individual-Level Metabolomics Dataset
 }
 \description{
-This dataset consists of a list of three data frames containing individual-level data, treatment effect estimates, and their associated variances.
+This is a subset of data, publicly available on MetaboAnalyst example datasets.
 }
 \usage{realdata}
 \format{
-  A list of data frames as follows:
-  \describe{
-    \item{\code{all}}{A dataframe with 12 rows and 14 columns containing individual-level data of 14 metabolites in columns and a total of 12 samples from two groups that have been run separately in two different instruments, leading to two separate studies in rows.}
-    \item{\code{effects}}{A dataframe with 2 rows and 14 columns, containing treatment effect estimates of the 14 metabolites for the 2 studies.}
-    \item{\code{var}}{A dataframe with 2 rows and 14 columns, containing associated variances of the treatment effects.}
-  }
+  A data frame with 172 observations on 14 metabolites.
 }
 
 \examples{
-head(realdata$all)
-head(realdata$effects)
-head(realdata$var)
+head(realdata)
 }
 \keyword{datasets}
