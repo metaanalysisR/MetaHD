@@ -139,7 +139,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,method = c("reml","fixed"),bscov = c("unst
 
 #' @export MetaHDInput
 #'
-MetaHDInput <- function(data,isMissing = FALSE, isLgTransformed = FALSE){
+MetaHDInput <- function(data){
   data <- as.data.frame(data)
   if (!is.factor(data[, 1]) || !is.factor(data[, 2])) {
     stop("Require study and group names as factors in the first and second columns respectively.")
@@ -150,20 +150,15 @@ MetaHDInput <- function(data,isMissing = FALSE, isLgTransformed = FALSE){
   if(length(unique(data[,2]))!=2){
     stop("Restrict to two groups only.\nEnsure that the first column contains the study names, the second column contains the groups.")
   }
+  if (any(is.na(data[,-c(1,2)]))) {
+    stop("The dataset contains missing values. MetaHDInput requires a complete data matrix.")
+  }
   names(data)[1:2] <- c("study", "group")
   group <- unique(data$group)
   N <- ncol(data[-c(1,2)])
   K <- length(unique(data[,1]))
   var_names <- names(data[-c(1,2)])
   split_data <- split(data,data$study)
-  if(isMissing){
-    for (i in 1:N){
-      for (k in 1:K) {
-        split_data[[k]][,i+2][is.na(split_data[[k]][,i+2])] <- mean(na.omit(split_data[[k]][,i+2]))
-      }
-    }
-    data <- do.call(rbind, split_data)
-  }
   sum_data <- data %>% group_by(study, group) %>%
               summarise(across(everything(), list(Mean = ~mean(.), Sd = ~sd(.), N = ~length(.)), .names = "{fn}_{col}"),.groups = "drop") %>%
               arrange(desc(group))
@@ -199,23 +194,12 @@ MetaHDInput <- function(data,isMissing = FALSE, isLgTransformed = FALSE){
   sd_split <- split(sqrt(var_df_long$var_est),var_df_long$study)
   Sk <- list()
   wscormat.shrink <- list()
-  if(isLgTransformed){
-    for (k in 1:K) {
-      wscormat.shrink[[k]] <- estimateCorMat(split_data[[k]][,3:(N+2)])
-      Sk[[k]] <- getCovMat(sd_split[[k]],wscormat.shrink[[k]])
-      rownames(Sk[[k]]) <- colnames(Sk[[k]]) <- var_names
-      if (!is.positive.definite(Sk[[k]])) {
-        Sk[[k]] <- as.matrix(nearPD(Sk[[k]],keepDiag = TRUE)$mat)
-      }
-    }
-  }else{
-    for (k in 1:K) {
-      wscormat.shrink[[k]] <- estimateCorMat(log(split_data[[k]][,3:(N+2)]))
-      Sk[[k]] <- getCovMat(sd_split[[k]],wscormat.shrink[[k]])
-      rownames(Sk[[k]]) <- colnames(Sk[[k]]) <- var_names
-      if (!is.positive.definite(Sk[[k]])) {
-        Sk[[k]] <- as.matrix(nearPD(Sk[[k]],keepDiag = TRUE)$mat)
-      }
+  for (k in 1:K) {
+    wscormat.shrink[[k]] <- estimateCorMat(log(split_data[[k]][,3:(N+2)]))
+    Sk[[k]] <- getCovMat(sd_split[[k]],wscormat.shrink[[k]])
+    rownames(Sk[[k]]) <- colnames(Sk[[k]]) <- var_names
+    if (!is.positive.definite(Sk[[k]])) {
+      Sk[[k]] <- as.matrix(nearPD(Sk[[k]],keepDiag = TRUE)$mat)
     }
   }
   return(list(Y = as.matrix(Effects),
