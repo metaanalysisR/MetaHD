@@ -10,10 +10,5 @@ library(devtools)
 devtools::install_github("metaanalysisR/MetaHD")
 ```
 
-# Vignette
-
-
-
-
 # To cite
-Liyanage, Jayamini, Prendergast, Luke, Staudte Robert, De Livera, Alysha “MetaHD: A multivariate meta-analysis model for metabolomics data” Submitted for review (2024)- article available on request to authors.
+Liyanage Jayamini C, Prendergast Luke, Staudte Robert, De Livera Alysha M. MetaHD: a multivariate meta-analysis model for metabolomics data. *Bioinformatics*. 2024;40(7) [freely available [here](https://doi.org/10.1093/bioinformatics/btae470)]
