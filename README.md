@@ -9,6 +9,8 @@ This package performs multivariate meta-analysis for high-dimensional metabolomi
 library(devtools)
 devtools::install_github("metaanalysisR/MetaHD")
 ```
+# Tutorial
+[Using MetaHD: A multivariate meta-analysis model for metabolomics data](https://bookdown.org/a2delivera/MetaHD/)
 
 # To cite
 Liyanage Jayamini C, Prendergast Luke, Staudte Robert, De Livera Alysha M. MetaHD: a multivariate meta-analysis model for metabolomics data. *Bioinformatics*. 2024;40(7) [freely available [here](https://doi.org/10.1093/bioinformatics/btae470)]
