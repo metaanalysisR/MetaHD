@@ -4,6 +4,11 @@ This package performs multivariate meta-analysis for high-dimensional metabolomi
 
 # Installation
 
+The latest version of MetaHD on CRAN can be installed directly within R as follows:
+```{r eval=FALSE}
+install.packages("MetaHD")
+```
+Alternatively, the development version can be downloaded using GitHub. To install this version, the user needs to make sure that Rtools has been installed and integrated prior.
 ```{r eval=FALSE}
 # install.packages("devtools")
 library(devtools)
