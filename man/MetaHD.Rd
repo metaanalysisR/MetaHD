@@ -2,14 +2,17 @@
 % Please edit documentation in R/MetaHD.R
 \name{MetaHD}
 \alias{MetaHD}
-\title{A Multivariate Meta-Analysis Model for Metabolomics Data}
+\title{A Multivariate Meta-Analysis Model for High-Dimensional Data}
 \usage{
 MetaHD(
   Y, Slist,
   Psi = NULL,
   method = c("reml", "fixed"),
   bscov = c("unstructured", "diag"),
-  rigls.maxiter = 1,
+  optim.algorithm = c("BOBYQA","hybrid","L-BFGS-B"),
+  initPsi = NULL,
+  optim.maxiter = 2000,
+  rigls.iter = 1,
   est.wscor = FALSE,
   shrinkCor = TRUE,
   impute.na = FALSE,
@@ -21,13 +24,19 @@ MetaHD(
 
 \item{Slist}{: K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, input associated variances of treatment effects in the form of a K x N matrix and set est.wscor = TRUE.}
 
-\item{Psi}{: N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package}
+\item{Psi}{: N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package).}
 
 \item{method}{: estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood}
 
 \item{bscov}{: a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances}
 
-\item{rigls.maxiter}{: maximum number of iterations of the restricted iterative generalized least square algorithm. Default is set to 1}
+\item{optim.algorithm}{: specifies the algorithm used to maximize the restricted log-likelihood function for estimating between-study variances. The default algorithm is "BOBYQA", which offers derivative-free, bound-constrained optimization by iteratively constructing a quadratic approximation of the objective function. The "hybrid" option performs up to rigls.iter iterations of the RIGLS algorithm, followed by quasi-Newton (BFGS algorithm) iterations until convergence. If rigls.iter is set to zero, only the quasi-Newton method (BFGS algorithm) is used for estimation. The "L-BFGS-B" algorithm is a limited-memory version of the BFGS quasi-Newton method, which supports box constraints, allowing each variable to have specified lower and/or upper bounds.}
+
+\item{initPsi}{: N x N diagonal matrix representing the starting values of the between-study variances to be used in the optimization procedures. If not specified, the starting values in Psi default to a diagonal matrix with variances set to 1.}
+
+\item{optim.maxiter}{: maximum number of iterations in methods involving optimization procedures.}
+
+\item{rigls.iter}{: number of iterations of the restricted iterative generalized least square algorithm (RIGLS) when used in the initial phase of hybrid optimization procedure. Default is set to 1}
 
 \item{est.wscor}{: a logical value indicating whether the within-study correlation matrix needs to be estimated or not. Default is FALSE}
 
@@ -41,6 +50,6 @@ MetaHD(
 A list of objects containing estimate : a N-dimensional vector of the combined estimates, std.err : a N-dimensional vector of the associated standard errors, pVal : a N-dimensional vector of the p-values, I2.stat : I2 statistic
 }
 \description{
-The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
-Assuming a meta-analysis is based on N outcomes/metabolites and K studies:
+The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple studies by using restricted maximum likelihood estimation.
+Assuming a meta-analysis is based on N outcomes and K studies:
 }
