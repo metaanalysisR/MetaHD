@@ -1,6 +1,6 @@
-#' A Multivariate Meta-Analysis Model for High-Dimensional Data
+#' A Multivariate Meta-Analysis Model for High-Dimensional Metabolomics Data
 #'
-#' The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple studies by using restricted maximum likelihood estimation.
+#' The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
 #' Assuming a meta-analysis is based on N outcomes and K studies:
 #'
 #' @usage MetaHD(
