@@ -2,7 +2,7 @@
 % Please edit documentation in R/MetaHD.R
 \name{MetaHD}
 \alias{MetaHD}
-\title{A Multivariate Meta-Analysis Model for High-Dimensional Data}
+\title{A Multivariate Meta-Analysis Model for High-Dimensional Metabolomics Data}
 \usage{
 MetaHD(
   Y, Slist,
@@ -50,6 +50,6 @@ MetaHD(
 A list of objects containing estimate : a N-dimensional vector of the combined estimates, std.err : a N-dimensional vector of the associated standard errors, pVal : a N-dimensional vector of the p-values, I2.stat : I2 statistic
 }
 \description{
-The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple studies by using restricted maximum likelihood estimation.
+The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
 Assuming a meta-analysis is based on N outcomes and K studies:
 }
