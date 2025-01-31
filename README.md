@@ -4,7 +4,7 @@ This package performs multivariate meta-analysis for high-dimensional metabolomi
 
 # Installation
 
-[![CRAN RStudio mirror downloads](https://cranlogs.r-pkg.org/badges/last-month/MetaHD?color=blue)](https://r-pkg.org/pkg/MetaHD)
+[![](https://cranlogs.r-pkg.org/badges/MetaHD)](https://cran.r-project.org/package=MetaHD)
 
 The latest version of MetaHD on CRAN can be installed directly within R as follows:
 ```{r eval=FALSE}
