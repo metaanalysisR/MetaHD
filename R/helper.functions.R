@@ -84,7 +84,11 @@
 .MetaHD_DC_core <- function(vars_in_group, y, Slist, Psi, initPsi, method, bscov, est.wscor, shrinkCor, optim.algorithm, optim.maxiter, rigls.iter, impute.na, impute.var, K, p, q) {
   N_dc <- length(vars_in_group)
   y_dc <- y[, vars_in_group, drop = FALSE]
-  Slist_dc <- lapply(Slist,function(s) s[vars_in_group, vars_in_group, drop = FALSE])
+  Slist_dc <- if (is.list(Slist)) {
+    lapply(Slist, function(s) s[vars_in_group, vars_in_group, drop = FALSE])
+  } else {
+    Slist[, vars_in_group, drop = FALSE]
+  }
   Psi_dc <- if (is.null(Psi)) NULL else Psi[vars_in_group, vars_in_group, drop = FALSE]
   initPsi_dc <- if (is.null(initPsi)) NULL else initPsi[vars_in_group, vars_in_group, drop = FALSE]
   return(

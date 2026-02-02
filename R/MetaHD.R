@@ -135,6 +135,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,method = c("multi","REM","FEM"),bscov = c(
   if (is.null(colnames(y)))
     colnames(y) <- paste0("Var", seq_len(N))
   var_names <- colnames(y)
+  study_names <- rownames(y)
   if (is.list(Slist)) {
     Slist <- lapply(Slist, function(Sk) {
       if (is.null(rownames(Sk)))
@@ -145,9 +146,9 @@ MetaHD <- function(Y,Slist,Psi = NULL,method = c("multi","REM","FEM"),bscov = c(
     })
   } else {
     if (is.null(rownames(Slist)))
-      rownames(Slist) <- paste0("Study", seq_len(K))
-    if (is.null(colnames(y)))
-      colnames(Slist) <- paste0("Var", seq_len(N))
+      rownames(Slist) <- study_names
+    if (is.null(colnames(Slist)))
+      colnames(Slist) <- var_names
   }
   if (!is.null(Psi) && (is.null(colnames(Psi)) || is.null(rownames(Psi)))) {
     colnames(Psi) <- rownames(Psi) <- var_names
