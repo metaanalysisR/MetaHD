@@ -2,54 +2,124 @@
 % Please edit documentation in R/MetaHD.R
 \name{MetaHD}
 \alias{MetaHD}
-\title{A Multivariate Meta-Analysis Model for High-Dimensional Metabolomics Data}
+\title{A Multivariate Meta-Analysis Model for High-Dimensional Data}
 \usage{
 MetaHD(
-  Y, Slist,
+  Y,
+  Slist,
   Psi = NULL,
-  method = c("reml", "fixed"),
-  bscov = c("unstructured", "diag"),
-  optim.algorithm = c("BOBYQA","hybrid","L-BFGS-B"),
-  initPsi = NULL,
-  optim.maxiter = 2000,
-  rigls.iter = 1,
+  method = c("multi","REM","FEM"),
+  bscov = c("unstructured","diag","none"),
+  useDivideConquer = FALSE,
+  parallel = FALSE,
   est.wscor = FALSE,
   shrinkCor = TRUE,
   impute.na = FALSE,
+  optim.algorithm = c("BOBYQA","hybrid","L-BFGS-B"),
+  optim.maxiter = 2000,
+  rigls.iter = 1,
+  initPsi = NULL,
   impute.var = 10^4
 )
 }
 \arguments{
-\item{Y}{: treatment effect sizes of the outcomes. This should be in the form of a K x N matrix}
+\item{Y}{treatment effect sizes of the outcomes. This should be in the form of a K x N matrix.}
 
-\item{Slist}{: K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, input associated variances of treatment effects in the form of a K x N matrix and set est.wscor = TRUE.}
+\item{Slist}{A K-dimensional list of N × N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, provide the associated variances of the treatment effects as a K × N matrix and set est.wscor = TRUE. For method = "REM" or method = "FEM", provide the associated variances of the treatment effects as a K × N matrix.}
 
-\item{Psi}{: N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package).}
+\item{Psi}{N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package).}
 
-\item{method}{: estimation method: "fixed" for fixed-effects models,"reml" for random-effects models fitted through restricted maximum likelihood}
+\item{method}{estimation method: "multi" for multivarite meta-analysis model fitted through restricted maximum likelihood estimation where the between-study covariance structure can be selected via 'bscov', "REM" for univariate random-effects model fitted through restricted maximum likelihood estimation and "FEM" for univariate fixed-effects model.}
 
-\item{bscov}{: a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximul likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage and "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances}
+\item{bscov}{a character vector defining the structure of the random-effects covariance matrix. Among available covariance structures, the user can select "unstructured" to obtain between-study covariance matrix with diagonal elements (variances) estimated using restricted maximum likelihood and off-diagonal elements (co-variances) reflecting the correlations estimated via shrinkage, "diag" (diagonal) for between-study variances as diagonal elements and zero co-variances, and "none" for zero between-study variances and co-variances.}
 
-\item{optim.algorithm}{: specifies the algorithm used to maximize the restricted log-likelihood function for estimating between-study variances. The default algorithm is "BOBYQA", which offers derivative-free, bound-constrained optimization by iteratively constructing a quadratic approximation of the objective function. The "hybrid" option performs up to rigls.iter iterations of the RIGLS algorithm, followed by quasi-Newton (BFGS algorithm) iterations until convergence. If rigls.iter is set to zero, only the quasi-Newton method (BFGS algorithm) is used for estimation. The "L-BFGS-B" algorithm is a limited-memory version of the BFGS quasi-Newton method, which supports box constraints, allowing each variable to have specified lower and/or upper bounds.}
+\item{useDivideConquer}{a logical value indicating whether to use the divide-and-conquer implementation of the fastMetaHD model. This option is used only when method = "multi". Default is FALSE.}
 
-\item{initPsi}{: N x N diagonal matrix representing the starting values of the between-study variances to be used in the optimization procedures. If not specified, the starting values in Psi default to a diagonal matrix with variances set to 1.}
+\item{parallel}{a logical value indicating whether to enable parallel computation for the divide-and-conquer approach. Default is \code{FALSE}. See also Details.}
 
-\item{optim.maxiter}{: maximum number of iterations in methods involving optimization procedures.}
+\item{est.wscor}{a logical value indicating whether the within-study correlation matrix needs to be estimated or not. Default is \code{FALSE}.}
 
-\item{rigls.iter}{: number of iterations of the restricted iterative generalized least square algorithm (RIGLS) when used in the initial phase of hybrid optimization procedure. Default is set to 1}
+\item{shrinkCor}{a logical value indicating whether a shrinkage estimator should be used to estimate within- or between-study correlation matrix. \code{TRUE}.}
 
-\item{est.wscor}{: a logical value indicating whether the within-study correlation matrix needs to be estimated or not. Default is FALSE}
+\item{impute.na}{a logical value indicating whether missing values need to be imputed or not. Default is \code{FALSE}.}
 
-\item{shrinkCor}{: a logical value indicating whether a shrinkage estimator should be used to estimate within- or between-study correlation matrix. Default is TRUE}
+\item{optim.algorithm}{specifies the algorithm used to maximize the restricted log-likelihood function for estimating between-study variances. The default algorithm is "BOBYQA", which offers derivative-free, bound-constrained optimization by iteratively constructing a quadratic approximation of the objective function. The "hybrid" option performs up to rigls.iter iterations of the RIGLS algorithm, followed by quasi-Newton (BFGS algorithm) iterations until convergence. If rigls.iter is set to zero, only the quasi-Newton method (BFGS algorithm) is used for estimation. The "L-BFGS-B" algorithm is a limited-memory version of the BFGS quasi-Newton method, which supports box constraints, allowing each variable to have specified lower and/or upper bounds.}
 
-\item{impute.na}{: a logical value indicating whether missing values need to be imputed or not. Default is FALSE}
+\item{optim.maxiter}{maximum number of iterations in methods involving optimization procedures.}
 
-\item{impute.var}{: multiplier for replacing the missing variances in Slist.(a large value, default is 10^4)}
+\item{rigls.iter}{number of iterations of the restricted iterative generalized least square algorithm (RIGLS) when used in the initial phase of hybrid optimization procedure. Default is set to 1.}
+
+\item{initPsi}{N x N diagonal matrix representing the starting values of the between-study variances to be used in the optimization procedures. If not specified, the starting values in Psi default to a diagonal matrix with variances set to 1.}
+
+\item{impute.var}{multiplier for replacing the missing variances in Slist.(a large value, default is 10^4).}
 }
 \value{
-A list of objects containing estimate : a N-dimensional vector of the combined estimates, std.err : a N-dimensional vector of the associated standard errors, pVal : a N-dimensional vector of the p-values, I2.stat : I2 statistic
+A list of objects containing :
+\itemize{
+\item \code{estimate}: An \eqn{N}-dimensional vector of the combined estimates.
+\item \code{std.err}: An \eqn{N}-dimensional vector of the associated standard errors.
+\item \code{pVal}: An \eqn{N}-dimensional vector of the \eqn{p}-values.
+\item \code{I2.stat}: \eqn{I^2} statistics.
+}
 }
 \description{
-The MetaHD function performs a multivariate meta-analysis for combining summary estimates obtained from multiple metabolomic studies by using restricted maximum likelihood estimation.
-Assuming a meta-analysis is based on N outcomes and K studies:
+The MetaHD function performs a multivariate meta-analysis for high-dimensional data, combining summary estimates obtained from multiple studies by using restricted maximum likelihood estimation. In its default settings, the function fits the fastMetaHD model, which provides a memory-efficient and computationally faster implementation of the MetaHD methodology.
+Assuming a meta-analysis is based on \eqn{N} outcomes and \eqn{K} studies:
+}
+\details{
+If \code{parallel = TRUE}, the divide-and-conquer approach may be evaluated in parallel. Parallel execution is implemented using the \code{future} R package.
+
+On Windows, users must set a future plan (e.g., \code{future::plan(future::multisession, workers = ncores)}) before calling \code{MetaHD()} in order to enable parallel computation.
+
+On Linux and macOS, users may alternatively use \code{future::plan(future::multicore, workers = ncores)}.
+
+If no future plan is set, or if \code{parallel = FALSE}, computations are performed sequentially.
+}
+\examples{
+# CREATE INPUT DATA
+input_data <- MetaHDInput(realdata)
+Y <- input_data$Y
+Slist <- input_data$Slist
+
+N <- ncol(Y)
+K <- nrow(Y)
+
+Smat <- matrix(0, nrow = K, ncol = N)
+for (i in 1:K) {
+ Smat[i, ] <- diag(Slist[[i]])
+}
+
+# MULTIVARIATE RANDOM-EFFECTS META-ANALYSIS (fastMetaHD)
+model <- MetaHD(Y = Y, Slist = Slist, method = "multi")
+model$estimate
+model$pVal
+
+# UNIVARIATE RANDOM-EFFECTS META-ANALYSIS
+model <- MetaHD(Y = Y, Slist = Smat, method = "REM")
+model$estimate
+model$pVal
+
+# UNIVARIATE FIXED-EFFECTS META-ANALYSIS
+model <- MetaHD(Y = Y, Slist = Smat, method = "FEM")
+model$estimate
+model$pVal
+
+}
+\references{
+Liyanage JC, Prendergast L, Staudte R, De Livera AM (2024).
+\emph{MetaHD: a multivariate meta-analysis model for metabolomics data}.
+Bioinformatics, 40(7), btae470.
+\doi{10.1093/bioinformatics/btae470}
+
+Powell MJ (2009).
+\emph{The BOBYQA algorithm for bound constrained optimization without derivatives}.
+Cambridge NA Report NA2009/06, University of Cambridge, 26, 26–46.
+
+Sera F, Armstrong B, Blangiardo M, et al. (2019).
+\emph{An extended mixed-effects framework for meta-analysis}.
+Statistics in Medicine, 38, 5429--5444.
+
+Schäfer J, Strimmer K (2005).
+\emph{A shrinkage approach to large-scale covariance estimation and implications for functional genomics}.
+Statistical Applications in Genetics and Molecular Biology, 4, 32.
 }
