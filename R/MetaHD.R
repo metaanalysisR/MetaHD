@@ -69,7 +69,7 @@
 #'  Smat[i, ] <- diag(Slist[[i]])
 #' }
 #'
-#' # MULTIVARIATE RANDOM-EFFECTS META-ANALYSIS (fastMetaHD)
+#' # MULTIVARIATE RANDOM-EFFECTS META-ANALYSIS 
 #' model <- MetaHD(Y = Y, Slist = Slist, method = "multi")
 #' model$estimate
 #' model$pVal
@@ -174,7 +174,7 @@ MetaHD <- function(Y,Slist,Psi = NULL,method = c("multi","REM","FEM"),bscov = c(
       if (parallel) {
         res_list <- future.apply::future_lapply(groups, function(vars_in_group) {
           .MetaHD_DC_core(vars_in_group = vars_in_group,y = y,Slist = Slist,Psi = Psi,initPsi = initPsi,method = method,bscov = bscov,est.wscor = est.wscor,shrinkCor = shrinkCor,optim.algorithm = optim.algorithm,optim.maxiter = optim.maxiter,rigls.iter = rigls.iter,impute.na = impute.na,impute.var = impute.var,K = K,p = p,q = q)
-        })
+        },future.seed = TRUE)
       } else {
         res_list <- lapply(groups, function(vars_in_group) {
           .MetaHD_DC_core(vars_in_group = vars_in_group,y = y,Slist = Slist,Psi = Psi,initPsi = initPsi,method = method,bscov = bscov,est.wscor = est.wscor,shrinkCor = shrinkCor,optim.algorithm = optim.algorithm,optim.maxiter = optim.maxiter,rigls.iter = rigls.iter,impute.na = impute.na,impute.var = impute.var,K = K,p = p,q = q)
