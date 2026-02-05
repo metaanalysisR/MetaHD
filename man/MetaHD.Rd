@@ -89,7 +89,7 @@ for (i in 1:K) {
  Smat[i, ] <- diag(Slist[[i]])
 }
 
-# MULTIVARIATE RANDOM-EFFECTS META-ANALYSIS (fastMetaHD)
+# MULTIVARIATE RANDOM-EFFECTS META-ANALYSIS 
 model <- MetaHD(Y = Y, Slist = Slist, method = "multi")
 model$estimate
 model$pVal
