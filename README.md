@@ -6,7 +6,9 @@ The 'MetaHD' R package provides access to our multivariate meta-analysis approac
 
 # Installation
 
-[![](https://cranlogs.r-pkg.org/badges/MetaHD)](https://cran.r-project.org/package=MetaHD)
+[![CRAN status](https://www.r-pkg.org/badges/version/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
+[![Downloads/month](https://cranlogs.r-pkg.org/badges/MetaHD)](https://cran.r-project.org/package=MetaHD)
+[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
 
 The latest version of MetaHD on CRAN can be installed directly within R as follows:
 ```{r eval=FALSE}
