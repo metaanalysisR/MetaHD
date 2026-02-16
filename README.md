@@ -1,15 +1,13 @@
 # MetaHD: A multivariate meta-analysis model for high-dimensional data
+[![CRAN](https://www.r-pkg.org/badges/version/MetaHD)](https://cran.r-project.org/package=MetaHD)
+[![Downloads/month](https://cranlogs.r-pkg.org/badges/last-month/MetaHD)](https://cran.r-project.org/package=MetaHD)
+[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
 
 This package performs multivariate meta-analysis for high-dimensional data (MetaHD) for integrating and collectively analysing individual-level data generated from multiple studies as well as for combining summary estimates. This approach accounts for correlation between metabolites, considers variability within and between studies, handles missing values and uses shrinkage estimation to allow for high dimensionality.
 
 The 'MetaHD' R package provides access to our multivariate meta-analysis approach, along with a comprehensive suite of existing meta-analysis methods, including fixed-effects and random-effects models, Fisher’s method, Stouffer’s method, the weighted Z method, Lancaster’s method, the weighted Fisher’s method, and vote-counting approach. 
 
 # Installation
-
-[![CRAN status](https://www.r-pkg.org/badges/version/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
-[![Downloads/month](https://cranlogs.r-pkg.org/badges/MetaHD)](https://cran.r-project.org/package=MetaHD)
-[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
-
 The latest version of MetaHD on CRAN can be installed directly within R as follows:
 ```{r eval=FALSE}
 install.packages("MetaHD")
