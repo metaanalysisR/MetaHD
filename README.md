@@ -1,7 +1,12 @@
-# MetaHD: A multivariate meta-analysis model for high-dimensional data <img src="man/figures/logo.png" align="right" height="150" alt=""/>
-[![CRAN status](https://img.shields.io/cran/v/MetaHD)](https://cran.r-project.org/package=MetaHD)
-[![Downloads/month](https://cranlogs.r-pkg.org/badges/last-month/MetaHD)](https://cran.r-project.org/package=MetaHD)
-[![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
+# MetaHD: A multivariate meta-analysis model for high-dimensional data <img src="man/figures/logo.png" align="right" height="140" alt=""/>
+
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
+[![CRAN release dates](http://www.r-pkg.org/badges/version-ago/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
+[![CRAN Downloads/month](https://cranlogs.r-pkg.org/badges/last-month/MetaHD)](https://cran.r-project.org/package=MetaHD)
+[![CRAN Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
+<!-- badges: end -->
+
 
 This package performs multivariate meta-analysis for high-dimensional data (MetaHD) for integrating and collectively analysing individual-level data generated from multiple studies as well as for combining summary estimates. This approach accounts for correlation between metabolites, considers variability within and between studies, handles missing values and uses shrinkage estimation to allow for high dimensionality.
 
