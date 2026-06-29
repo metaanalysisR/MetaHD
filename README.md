@@ -1,7 +1,7 @@
 # MetaHD: A multivariate meta-analysis model for high-dimensional data <img src="man/figures/logo.png" align="right" height="140" alt=""/>
 
 <!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
+[![CRAN status](https://badges.cranchecks.info/worst/MetaHD.svg)](https://CRAN.R-project.org/package=MetaHD)
 [![CRAN release dates](http://www.r-pkg.org/badges/version-ago/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
 [![CRAN Downloads/month](https://cranlogs.r-pkg.org/badges/last-month/MetaHD)](https://cran.r-project.org/package=MetaHD)
 [![CRAN Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
