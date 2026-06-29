@@ -1,4 +1,4 @@
-# MetaHD: A multivariate meta-analysis model for high-dimensional data
+# MetaHD: A multivariate meta-analysis model for high-dimensional data <img src="man/figures/logo.png" align="right" height="120" alt=""/>
 [![CRAN status](https://img.shields.io/cran/v/MetaHD)](https://cran.r-project.org/package=MetaHD)
 [![Downloads/month](https://cranlogs.r-pkg.org/badges/last-month/MetaHD)](https://cran.r-project.org/package=MetaHD)
 [![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
