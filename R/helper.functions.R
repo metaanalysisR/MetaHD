@@ -1,4 +1,5 @@
 ########################### MetaHD core function ##############################
+
 .MetaHD_core <- function(y, Slist, Psi, method, bscov, est.wscor, shrinkCor, optim.algorithm, optim.maxiter, rigls.iter, initPsi, impute.na, impute.var, N, K, p, q) {
   nay <- is.na(y)
   nall <- sum(!nay)
@@ -70,8 +71,8 @@
   }
   Ainv <- chol2inv(chol(A))
   est <- as.numeric(Ainv %*% B)
-  se  <- sqrt(diag(Ainv))
-  p   <- 2 * (1 - pnorm(abs(est / se)))
+  se <- sqrt(diag(Ainv))
+  p <- 2 * (1 - pnorm(abs(est / se)))
   i2 <- i2Stat(X, y, Xlist, ylist, Slist, S, nay, N, nall, p)
   return(list(estimate = est,
               std.err = se,
@@ -95,9 +96,123 @@
     .MetaHD_core(y = y_dc, Slist = Slist_dc, Psi = Psi_dc, method = method, bscov = bscov, est.wscor = est.wscor, shrinkCor = shrinkCor, optim.algorithm = optim.algorithm, optim.maxiter = optim.maxiter, rigls.iter = rigls.iter, initPsi = initPsi_dc, impute.na = impute.na, impute.var = impute.var, N = N_dc, K = K, p = p, q = q)
   )
 }
+############################ Clustering diagnostics ###########################
+
+compute_clustering_diagnostics <- function(clusters, distMat) {
+  if (length(unique(clusters)) < 2) {
+    return(list(
+      avg_silhouette = NA,
+      cluster_avg = NA,
+      n_clusters = 1L,
+      cluster_sizes = table(clusters),
+      silhouette_object = NULL
+    ))
+  }
+  sil <- cluster::silhouette(clusters, distMat)
+  sil_summary <- summary(sil)
+  return(list(
+    avg_silhouette = mean(sil[, "sil_width"]),
+    cluster_avg = sil_summary$clus.avg.widths,
+    n_clusters = length(unique(clusters)),
+    cluster_sizes = table(clusters),
+    silhouette_object = sil
+  ))
+}
+
+###################### select dendrogram cut methods ##########################
+
+cut_dendrogram <- function(hc, distMat, method = c("dynamicTreeCut", 
+                                                   "fixedHeight", 
+                                                   "fixedK", 
+                                                   "optimalK"),
+                           height = NULL, k = NULL) {
+  method <- match.arg(method)
+  silhouette_by_k <- NULL
+  if (method == "dynamicTreeCut") {
+    clusters <- {
+      invisible(capture.output(
+        res <- dynamicTreeCut::cutreeDynamic(hc,distM = as.matrix(distMat)),
+        type = "output"
+      ))
+      res
+    }
+  } else if (method == "fixedHeight") {
+    if (is.null(height)) stop("Please provide 'height' for fixedHeight method.")
+    clusters <- cutree(hc, h = height)
+  } else if (method == "fixedK") {
+    if (is.null(k)) stop("Please provide 'k' for fixedK method.")
+    clusters <- cutree(hc, k = k)
+  } else if (method == "optimalK") {
+    out <- optimal_cut_silhouette(hc, distMat)
+    clusters <- out$labels
+    silhouette_by_k <- out$silhouette_by_k
+  }
+  return(list(
+    clusters = clusters,
+    silhouette_by_k = silhouette_by_k  
+  ))
+}
+
+optimal_cut_silhouette <- function(hc, distMat) {
+  n_outcomes <- attr(distMat, "Size")
+  candidate_k <- 2:(n_outcomes - 1)  
+  results <- data.frame(k = candidate_k, avg_silhouette = NA)
+  for (k in candidate_k) {
+    labels <- cutree(hc, k = k)
+    sil <- cluster::silhouette(labels, distMat)
+    results$avg_silhouette[results$k == k] <- mean(sil[, "sil_width"])
+  }
+  best_k <- results$k[which.max(results$avg_silhouette)]
+  message("Optimal number of clusters selected: ", best_k,
+          " (avg silhouette = ", 
+          round(max(results$avg_silhouette), 3), ")")
+  return(list(
+    labels = cutree(hc, k = best_k),  
+    silhouette_by_k = results            
+  ))
+}
 
 ############################ estimate correlations ############################
 
+#' Estimate the correlation matrix using observed treatment effects
+#'
+#' Estimates the correlation matrix among outcomes from observed treatment
+#' effect sizes. This is the correlation structure that \code{\link{MetaHD}}
+#' uses internally: for the divide-and-conquer clustering of outcomes, as an
+#' estimate of the within-study correlations when these are unavailable, and
+#' to estimate the between-study correlations. When the number of outcomes
+#' exceeds the number of studies (\eqn{N > K}), a shrinkage estimator
+#' (Schaefer and Strimmer, 2005) is used by default to obtain a
+#' well-conditioned estimate.
+#'
+#' @param Y A K x N matrix of treatment effect sizes (K studies, N outcomes).
+#' @param shrinkCor Logical. Whether to use a shrinkage estimator for the
+#'   correlation matrix when \eqn{N > K}. Default is \code{TRUE}.
+#' @param impute.na Logical. Whether to impute missing values (each missing
+#'   entry is replaced by its column mean) before estimating the correlations.
+#'   Default is \code{FALSE}.
+#'
+#' @return An N x N correlation matrix. When there are two or fewer studies
+#'   (\eqn{K \le 2}), the correlations cannot be estimated and \code{0} is
+#'   returned.
+#'
+#' @seealso \code{\link{plot_correlation_heatmap}} for visualising a
+#'   correlation matrix.
+#'
+#' @references
+#' Schaefer, J. and Strimmer, K. (2005).
+#' \emph{A shrinkage approach to large-scale covariance estimation and
+#' implications for functional genomics}.
+#' Statistical Applications in Genetics and Molecular Biology, 4, 32.
+#'
+#' @examples
+#' Y <- simdata.1$Y
+#' cormat <- estimateCorMat(Y)
+#' dim(cormat)
+#'
+#' @importFrom stats cor na.omit
+#' @importFrom corpcor cor.shrink
+#' @export
 estimateCorMat <- function(Y,shrinkCor = TRUE,impute.na = FALSE){
   N <- ncol(Y)
   K <- nrow(Y)
@@ -167,11 +282,93 @@ i2Stat <- function(X, y,  Xlist, ylist, Slist, S, nay, N, nall, p){
   return(I2)
 }
 
+############### open the right graphics device for a file path ################
+
+.open_plot_device <- function(file, width, height, units, dpi) {
+  ext <- tolower(tools::file_ext(file))
+  if (!nzchar(ext)) {
+    stop("`file` must have an extension ",
+         "(e.g. .pdf, .png, .jpeg, .tiff, .svg, .bmp).", call. = FALSE)
+  }
+  parent <- dirname(file)
+  if (!dir.exists(parent)) {
+    dir.create(parent, recursive = TRUE, showWarnings = FALSE)
+  }
+  to_inches <- function(x, units) {
+    switch(units,
+           "in" = x,
+           "cm" = x / 2.54,
+           "mm" = x / 25.4,
+           stop("`units` must be 'in', 'cm', or 'mm'.", call. = FALSE))
+  }
+  w_in <- to_inches(width,  units)
+  h_in <- to_inches(height, units)
+  switch(ext,
+         pdf = grDevices::pdf(file, width = w_in, height = h_in, 
+                               onefile = FALSE),
+         svg = grDevices::svg(file, width = w_in, height = h_in),
+         png = grDevices::png(file, width = w_in * dpi, height = h_in * dpi,
+                               res = dpi),
+         jpg = ,
+         jpeg = grDevices::jpeg(file, width = w_in * dpi, height = h_in * dpi,
+                                res = dpi, quality = 95),
+         tif = ,
+         tiff = grDevices::tiff(file, width = w_in * dpi, height = h_in * dpi,
+                                res = dpi, compression = "lzw"),
+         bmp = grDevices::bmp(file, width = w_in * dpi, height = h_in * dpi,
+                               res = dpi),
+         stop("Unsupported file extension '", ext,
+              "'. Use one of: pdf, svg, png, jpeg, tiff, bmp.",
+              call. = FALSE)
+  )
+  invisible(NULL)
+}
+
+###################### highlight queries for upset plot #######################
+
+.build_intersect_queries <- function(highlight,
+                                     available_sets,
+                                     highlight_colors = NULL) {
+  if (!is.list(highlight)) {
+    stop("`highlight` must be a list of character vectors.", call. = FALSE)
+  }
+  if (!all(vapply(highlight, is.character, logical(1)))) {
+    stop("Each element of `highlight` must be a character vector.",
+         call. = FALSE)
+  }
+  bad <- setdiff(unlist(highlight), available_sets)
+  if (length(bad) > 0L) {
+    stop("Unknown set name(s) in `highlight`: ",
+         paste(bad, collapse = ", "),
+         ". Available sets: ", paste(available_sets, collapse = ", "),
+         call. = FALSE)
+  }
+  if (is.null(highlight_colors)) {
+    cols <- grDevices::hcl.colors(length(highlight), palette = "Dark 3")
+  } else {
+    if (length(highlight_colors) != length(highlight)) {
+      stop("Length of `highlight_colors` must match length of `highlight` (",
+           length(highlight), ").", call. = FALSE)
+    }
+    cols <- highlight_colors
+  }
+  lapply(seq_along(highlight), function(i) {
+    list(
+      query = UpSetR::intersects,
+      params = as.list(highlight[[i]]),
+      color = cols[i],
+      active = TRUE,
+      query.name = paste(highlight[[i]], collapse = " & ")
+    )
+  })
+}
+
 ########################### other helper functions ############################
 
 dimCheck <- function(Slist, K, N) {
   if (is.list(Slist)) {
-    stop("Require within-study variances to be in the form of a K x N matrix, where K is the number of studies and N is the number of outcomes")
+    stop("Require within-study variances to be in the form of a K x N matrix, 
+         where K is the number of studies and N is the number of outcomes")
   }
   WSVar <- as.matrix(Slist)
   if (nrow(WSVar) != K || ncol(WSVar) != N) {
