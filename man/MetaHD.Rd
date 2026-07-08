@@ -11,7 +11,11 @@ MetaHD(
   method = c("multi","REM","FEM"),
   bscov = c("unstructured","diag","none"),
   useDivideConquer = FALSE,
+  DCgroups = NULL,
   parallel = FALSE,
+  dendro.method = c("dynamicTreeCut", "fixedHeight", "fixedK", "optimalK"),
+  dendro.height = NULL,
+  dendro.k = NULL,
   est.wscor = FALSE,
   shrinkCor = TRUE,
   impute.na = FALSE,
@@ -25,7 +29,7 @@ MetaHD(
 \arguments{
 \item{Y}{treatment effect sizes of the outcomes. This should be in the form of a K x N matrix.}
 
-\item{Slist}{A K-dimensional list of N × N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, provide the associated variances of the treatment effects as a K × N matrix and set est.wscor = TRUE. For method = "REM" or method = "FEM", provide the associated variances of the treatment effects as a K × N matrix.}
+\item{Slist}{A K-dimensional list of N x N matrices representing within-study variances and covariances of the treatment effects. If within-study correlations are not available, provide the associated variances of the treatment effects as a K x N matrix and set est.wscor = TRUE. For method = "REM" or method = "FEM", provide the associated variances of the treatment effects as a K x N matrix.}
 
 \item{Psi}{N x N matrix representing between-study variances and covariances of the treatment effects. (optional, if not specified this will be estimated internally by "MetaHD" using "estimateBSvar" and "estimateCorMat" functions in "MetaHD" package).}
 
@@ -35,7 +39,27 @@ MetaHD(
 
 \item{useDivideConquer}{a logical value indicating whether to use the divide-and-conquer implementation of the fastMetaHD model. This option is used only when method = "multi". Default is FALSE.}
 
+\item{DCgroups}{A list of outcome groups for the divide-and-conquer approach. Each element should be a character vector containing the names of outcomes belonging to the same cluster. Outcome names must match column names in the input data (Y), and each outcome may appear in at most one group. If \code{NULL}, groups are determined automatically within the function using hierarchical clustering followed by a dynamic tree cut.}
+
 \item{parallel}{a logical value indicating whether to enable parallel computation for the divide-and-conquer approach. Default is \code{FALSE}. See also Details.}
+
+\item{dendro.method}{Character string specifying the method used to cut the dendrogram when \code{useDivideConquer = TRUE} and \code{DCgroups = NULL}.
+One of:
+\describe{
+\item{\code{"dynamicTreeCut"}}{Default. Automatically determines the
+number of clusters using the dynamic tree cut algorithm.}
+\item{\code{"fixedHeight"}}{Cuts the dendrogram at a fixed height
+specified via \code{dendro.height}.}
+\item{\code{"fixedK"}}{Cuts the dendrogram into a fixed number of
+clusters specified via \code{dendro.k}.}
+\item{\code{"optimalK"}}{Automatically selects the optimal number of
+clusters by maximising the average silhouette width across all
+candidate partitions.}
+}}
+
+\item{dendro.height}{A numeric value specifying the height at which to cut the dendrogram. Only used when \code{dendro.method = "fixedHeight"}. Must be a positive number within the range of the dendrogram heights. Use \code{plot_dendrogram(Y)} to visualize the dendrogram and choose an appropriate height before running \code{MetaHD}. If \code{NULL} (default) and \code{dendro.method = "fixedHeight"}, an error is thrown.}
+
+\item{dendro.k}{A positive integer specifying the desired number of clusters. Only used when \code{dendro.method = "fixedK"}. Must be between 2 and \code{ncol(Y) - 1}. If \code{NULL} (default) and \code{dendro.method = "fixedK"}, an error is thrown.}
 
 \item{est.wscor}{a logical value indicating whether the within-study correlation matrix needs to be estimated or not. Default is \code{FALSE}.}
 
@@ -60,6 +84,24 @@ A list of objects containing :
 \item \code{std.err}: An \eqn{N}-dimensional vector of the associated standard errors.
 \item \code{pVal}: An \eqn{N}-dimensional vector of the \eqn{p}-values.
 \item \code{I2.stat}: \eqn{I^2} statistics.
+\item \code{clustering_diagnostics}: A list of clustering diagnostic outputs
+returned when \code{useDivideConquer = TRUE} and \code{DCgroups = NULL}.
+Contains:
+\itemize{
+\item \code{avg_silhouette}: Overall average silhouette width across
+all outcomes.
+\item \code{cluster_avg}: Average silhouette width per cluster.
+\item \code{n_clusters}: Number of clusters identified.
+\item \code{cluster_sizes}: Number of outcomes in each cluster.
+\item \code{silhouette_object}: The full silhouette object of class
+\code{"silhouette"}, which can be passed directly to \code{plot()}
+for visualization.
+\item \code{silhouette_by_k}: A data frame with columns \code{k} and
+\code{avg_silhouette}, returned only when
+\code{dendro.method = "optimalK"}, showing the average silhouette
+width at each candidate partition used to select the optimal
+number of clusters.
+}
 }
 }
 \description{
@@ -113,13 +155,21 @@ Bioinformatics, 40(7), btae470.
 
 Powell MJ (2009).
 \emph{The BOBYQA algorithm for bound constrained optimization without derivatives}.
-Cambridge NA Report NA2009/06, University of Cambridge, 26, 26–46.
+Cambridge NA Report NA2009/06, University of Cambridge, 26, 26--46.
 
 Sera F, Armstrong B, Blangiardo M, et al. (2019).
 \emph{An extended mixed-effects framework for meta-analysis}.
 Statistics in Medicine, 38, 5429--5444.
 
-Schäfer J, Strimmer K (2005).
+Schaefer J, Strimmer K (2005).
 \emph{A shrinkage approach to large-scale covariance estimation and implications for functional genomics}.
 Statistical Applications in Genetics and Molecular Biology, 4, 32.
+
+Langfelder, P., Zhang, B. and Horvath, S. (2008).
+\emph{Defining clusters from a hierarchical cluster tree: the Dynamic Tree Cut package for R}.
+Bioinformatics, 24(5), pp. 719--720.
+
+Rousseeuw, P.J. (1987).
+\emph{Silhouettes: a graphical aid to the interpretation and validation of cluster analysis}.
+Journal of Computational and Applied Mathematics, 20, pp. 53--65.
 }

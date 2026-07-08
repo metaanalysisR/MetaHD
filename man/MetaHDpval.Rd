@@ -42,18 +42,18 @@ R package, as well as a vote counting method implemented using the
 \itemize{
 \item \strong{Fisher's method} (Fisher, 1932), which combines logarithmically
 transformed \eqn{p}-values from individual studies for each outcome using
-Fisher’s statistic.
+Fisher's statistic.
 \item \strong{Stouffer's method} (Stouffer et al., 1949), which combines
-inverse normal–transformed \eqn{p}-values derived from individual study test
+inverse normal-transformed \eqn{p}-values derived from individual study test
 statistics for each outcome.
 \item \strong{Weighted Z-method (wZ)} (Mosteller and Bush, 1954), an extension
-of Stouffer’s method that incorporates study-specific weights, resulting in
+of Stouffer's method that incorporates study-specific weights, resulting in
 a weighted inverse normal combination.
 \item \strong{Lancaster's method} (Lancaster, 1961), which generalizes
-Fisher’s method by introducing weights and exploits the additive property of
+Fisher's method by introducing weights and exploits the additive property of
 the \eqn{\chi^2}-distribution.
 \item \strong{Weighted Fisher's method (wFisher)} (Yoon et al., 2021), which extends
-Fisher’s method by allowing non-integer weights reflecting study-specific
+Fisher's method by allowing non-integer weights reflecting study-specific
 information (e.g., sample sizes). This approach replaces the
 \eqn{\chi^2}-distribution with the gamma distribution to accommodate
 non-integer degrees of freedom.
@@ -90,7 +90,7 @@ Yoon, S. (2023). \emph{metapro: Robust P-Value Combination Methods}
 (R package version 1.5.11). Comprehensive R Archive Network (CRAN).
 \doi{10.32614/CRAN.package.metapro}
 
-Becker, B.J. (1994). \emph{Combining significance levels. In Cooper H, Hedges LV (eds.), A handbook of research synthesis}, 215–230. Russell Sage, New York.
+Becker, B.J. (1994). \emph{Combining significance levels. In Cooper H, Hedges LV (eds.), A handbook of research synthesis}, 215--230. Russell Sage, New York.
 
 Dewey, M. (2025). \emph{metap: Meta-Analysis of Significance Values}
 (R package version 1.13). Comprehensive R Archive Network (CRAN).

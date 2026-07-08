@@ -13,7 +13,7 @@ MetaHDInput(data)
 A list of objects containing :
 \itemize{
 \item \code{Y}: A \eqn{K \times N} matrix of treatment effect sizes, where \eqn{K} is the number of studies and \eqn{N} is the number of outcomes.
-\item \code{Slist}: A list of length \eqn{K} containing \eqn{N \times N} within-study variance–covariance matrices of the treatment effects.
+\item \code{Slist}: A list of length \eqn{K} containing \eqn{N \times N} within-study variance-covariance matrices of the treatment effects.
 }
 }
 \description{
@@ -27,7 +27,7 @@ input_data <- MetaHDInput(realdata)
 Y <- input_data$Y
 head(Y)
 
-## within-study variance–covariance matrices
+## within-study variance-covariance matrices
 Slist <- input_data$Slist
 head(Slist[[1]])
 
