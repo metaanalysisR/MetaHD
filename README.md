@@ -8,9 +8,9 @@
 <!-- badges: end -->
 
 
-This package performs multivariate meta-analysis for high-dimensional data (MetaHD) for integrating and collectively analysing individual-level data generated from multiple studies as well as for combining summary estimates. This approach accounts for correlation between metabolites, considers variability within and between studies, handles missing values and uses shrinkage estimation to allow for high dimensionality.
+Performs multivariate meta-analysis for high-dimensional data to integrate and collectively analyse individual-level data from multiple studies, as well as to combine summary estimates. This approach accounts for correlation between outcomes, incorporates within- and between-study variability, handles missing values, and uses shrinkage estimation to accommodate high dimensionality.
 
-The `MetaHD` R package provides access to our multivariate meta-analysis approach, along with a comprehensive suite of existing meta-analysis methods, including fixed-effects and random-effects models, Fisher’s method, Stouffer’s method, the weighted Z method, Lancaster’s method, the weighted Fisher’s method, and vote-counting approach. 
+The `MetaHD` R package provides access to our multivariate meta-analysis approach, along with a comprehensive suite of existing meta-analysis methods, including fixed-effects and random-effects models, Fisher's method, Stouffer's method, the weighted Z method, Lancaster's method, the weighted Fisher's method, and vote-counting approach. Visualisation tools are provided for interpreting and comparing results across methods, including Venn diagrams, UpSet plots, and ROC curves, heatmaps of pooled effect sizes and correlations among outcomes.
 
 # Installation
 The latest version of MetaHD on CRAN can be installed directly within R as follows:
