@@ -179,7 +179,9 @@ print(aucs)
 
 # Example 5: Venn diagram (Tav, 2025)
 # Requires R >= 4.5 and gVenn installed
-plot(res, type = "venn")
+if (requireNamespace("gVenn", quietly = TRUE)) {
+  plot(res, type = "venn")
+}
 
 \dontrun{
 # Example 6: save plots to file
