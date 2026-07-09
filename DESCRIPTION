@@ -1,7 +1,7 @@
 Package: MetaHD
 Type: Package
 Title: A Multivariate Meta-Analysis Model for High-Dimensional Data
-Version: 0.1.5
+Version: 0.1.6
 Authors@R: c(
   person("Jayamini", "Liyanage", role = c("aut", "cre"),
          email = "j.liyanage@latrobe.edu.au"),
@@ -60,7 +60,6 @@ LinkingTo:
     RcppArmadillo
 Suggests:
     gVenn,
-    BiocManager,
     testthat (>= 3.0.0)
 biocViews:
 Config/roxygen2/version: 8.0.0
