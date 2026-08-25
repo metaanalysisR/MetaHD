@@ -5,7 +5,7 @@
 [![CRAN release dates](http://www.r-pkg.org/badges/version-ago/MetaHD)](https://CRAN.R-project.org/package=MetaHD)
 [![CRAN Downloads/month](https://cranlogs.r-pkg.org/badges/last-month/MetaHD)](https://cran.r-project.org/package=MetaHD)
 [![CRAN Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/MetaHD)](https://cran.r-project.org/package=MetaHD)
-[![GitHub Downloads](https://img.shields.io/github/downloads/USERNAME/MetaHD/total)](https://github.com/metaanalysisR/MetaHD)
+[![GitHub Downloads](https://img.shields.io/github/downloads/USERNAME/MetaHD/total)](https://github.com/metaanalysisR/MetaHD/releases)
 <!-- badges: end -->
 
 
